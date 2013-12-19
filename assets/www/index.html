@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 	<title>Page Title</title>
@@ -38,7 +38,19 @@
 				else{
 					window.location.href = "#driverSchedule";
 				}						
-			});		
+			});
+
+				// type of cash
+				$("#ddlType").on("change",function(){
+					cashType = $(this).val();
+					if(cashType == "voucher"){
+						$("#typeVoucher").append("<fieldset data-role='controlgroup'><legend>Vouhcer type</legend><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2a' value='on' checked='checked'><label for='radio-choice-v-2a'>Groupon $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2b' value='off'><label for='radio-choice-v-2b'>Groupon $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2c' value='other'><label for='radio-choice-v-2c'>Groupon $249</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2d' value='other'><label for='radio-choice-v-2d'>Living Social $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2e' value='other'><label for='radio-choice-v-2e'> Living Social $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2f' value='other'><label for='radio-choice-v-2f'>Living social $249</label> </fieldset>").slideDown(9000);
+						$('#stopJob').trigger('create');
+					}
+					else{
+						$("#typeVoucher").empty();						
+					}
+				});
 		});	
 	</script>
 </head>
@@ -278,8 +290,8 @@
 					<option value="cash">
 						Cash
 					</option>
-					<option value="cheque">
-						Cheque
+					<option value="check">
+						Check
 					</option>
 					<option value="cc">
 						CC
@@ -292,9 +304,12 @@
 					</option>
 				</select>
 			</div>
+			<div data-role="fieldcontain" id="typeVoucher">
+				
+			</div>
 			<div data-role="fieldcontain">
 				<label for="txtNotePrice">
-					How did you love up with price?
+					How did you come up with the price?
 				</label>
 				<textarea name="end_job_note" id="txtNotePrice" placeholder="" data-mini="true"></textarea>
 			</div>
