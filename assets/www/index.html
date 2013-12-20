@@ -44,7 +44,7 @@
 				$("#ddlType").on("change",function(){
 					cashType = $(this).val();
 					if(cashType == "voucher"){
-						$("#typeVoucher").append("<fieldset data-role='controlgroup'><legend>Vouhcer type</legend><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2a' value='on' checked='checked'><label for='radio-choice-v-2a'>Groupon $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2b' value='off'><label for='radio-choice-v-2b'>Groupon $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2c' value='other'><label for='radio-choice-v-2c'>Groupon $249</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2d' value='other'><label for='radio-choice-v-2d'>Living Social $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2e' value='other'><label for='radio-choice-v-2e'> Living Social $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2f' value='other'><label for='radio-choice-v-2f'>Living social $249</label> </fieldset>").slideDown(9000);
+						$("#typeVoucher").append("<fieldset data-transition='slidedown' data-role='controlgroup'><legend>Vouhcer type</legend><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2a' value='on' checked='checked'><label for='radio-choice-v-2a'>Groupon $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2b' value='off'><label for='radio-choice-v-2b'>Groupon $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2c' value='other'><label for='radio-choice-v-2c'>Groupon $249</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2d' value='other'><label for='radio-choice-v-2d'>Living Social $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2e' value='other'><label for='radio-choice-v-2e'> Living Social $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2f' value='other'><label for='radio-choice-v-2f'>Living social $249</label> </fieldset>").slideDown(9000);
 						$('#stopJob').trigger('create');
 					}
 					else{
@@ -201,7 +201,12 @@
        </table>		
 	</div><!-- /content -->
 		<div data-role="footer" data-id="fixNavbar" data-position="fixed">
-			
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#driverSchedule">Activities</a></li>
+					<li><a href="#dayEndingScreen">End Day</a></li>								
+				</ul>
+			</div><!-- /navbar -->
 		</div><!-- /footer -->
 	</div><!-- /page -->
 
@@ -249,7 +254,7 @@
 		</div>-->
 		
 		<div data-inline="true">
-			<a href="#stopJob" data-role="button" data-theme="b">End</a>
+			<a href="#stopJob" data-inline="true" data-role="button" data-theme="b">End</a>
 		</div>
 	
 		</div><!-- /content -->
@@ -322,7 +327,7 @@
 				data-mini="true"/>
 			</div>
 				
-			<a id="btnBetaPhoto" data-role="button" data-theme="b" href="#page1">
+			<a id="btnBetaPhoto" data-inline="true" data-role="button" data-theme="b" href="#page1">
 				Upload Beta Photo
 			</a>
 		</div><!-- /content -->
@@ -355,7 +360,7 @@
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#welcomeManagerScreen">Driver</a></li>
-					<li><a href="#welcomeManagerScreen2">Activities</a></li>					
+					<li><a href="#welcomeManagerScreen2">Activities</a></li>								
 				</ul>
 			</div><!-- /navbar -->
 	</div><!-- /footer -->
@@ -458,7 +463,7 @@
 					<div data-role="navbar">
 						<ul>
 							<li><a href="#welcomeManagerScreen">Driver</a></li>
-							<li><a href="#welcomeManagerScreen2">Activities</a></li>					
+							<li><a href="#welcomeManagerScreen2">Activities</a></li>													
 						</ul>
 					</div><!-- /navbar -->
 			</div><!-- /footer -->
@@ -510,7 +515,7 @@
              </div>			 
 			 
 			 <div data-role="fieldcontain" class = "ui-hide-label">
-                   <a id="btnBetaPhoto" data-role="button" data-theme="b" href="#page1">
+                   <a id="btnBetaPhoto" data-inline="true" data-role="button" data-theme="b" href="#page1">
 						Upload Alpha Photo
 					</a>
             </div>
@@ -541,6 +546,68 @@
 
 		<div data-role="footer" data-position="fixed">
 			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+	</div><!-- /page -->	
+	
+	<!-- Day ending page for driver -->
+	<div data-role="page" id="dayEndingScreen" data-postion = "fixed">
+
+		<div data-role="header">
+			<h1>Bar</h1>
+		</div><!-- /header -->
+
+		<div data-role="content">
+			 <fieldset>
+
+			<div data-role="fieldcontain" class = "ui-hide-label">                  
+					<label for="birth-place">Disposal Weight</label>
+                    <input type="text" name="disposalWeight" id="disposalWeight" value="" placeholder="Disposal Weight"/>
+             </div>
+			<div data-role="fieldcontain" class = "ui-hide-label">                  
+					<label for="birth-place">Invoice Number</label>
+                    <input type="text" name="invoiceNumber" id="invoiceNumber" value="" placeholder="Invoice Number"/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Gas</label>
+                    <input type="text" name="gas" id="gas" value="" placeholder="Gas"/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Tolls</label>
+                    <input type="text" name="tolls" id="tolls" value="" placeholder="Tolls"/>
+             </div>
+			  <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Disposal Expense</label>
+                    <input type="text" name="disposalExpense" id="disposalExpense" value="" placeholder="Disposal Expense"/>
+             </div>
+			  <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Other Expense</label>
+                    <input type="text" name="otherExpense" id="otherExpense" value="" placeholder="Other Expense"/>
+             </div>			 
+			 
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                   <a id="btnDayEnd" data-role="button" data-inline="true" data-theme="b" href="#page1">
+						End
+					</a>
+            </div>		
+        </fieldset>
+		
+		<!--<div id="hidden-wrapper2">
+			<div id="text-container ">
+				<button type="reset" data-inline="true" data-theme="b">Start</button>
+			</div>
+			<div id="btn-container">
+				<button type="reset" data-inline="true" data-theme="b">Stop</button>
+			</div>        
+		</div>-->		
+		</div><!-- /content -->
+
+		<div data-role="footer" data-id="fixNavbar" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#driverSchedule">Activities</a></li>
+					<li><a href="#dayEndingScreen">End Day</a></li>								
+				</ul>
+			</div><!-- /navbar -->
 		</div><!-- /footer -->
 	</div><!-- /page -->	
 	
