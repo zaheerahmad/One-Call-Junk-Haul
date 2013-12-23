@@ -1,0 +1,774 @@
+<!-- Copyright (c) 2012 Mobile Developer Solutions -->
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-type" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+    <title></title>
+
+	<script type="text/javascript" charset="utf-8" src="phonegap-1.4.1.js"></script>
+	<link rel="stylesheet" href="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	<link rel="stylesheet" href="index.css" /> 
+	<script type="text/javascript" charset="utf-8" src="phonegap-1.4.1.js"></script>
+	<script type="text/javascript" charset="utf-8">
+	     var text;
+         var allDriverArray;
+         var uuid;
+			
+		var responseData;
+           
+
+
+
+
+			 
+			 function getAllDriver(responseJson){				
+				if(responseJson.status == 'Success'){                 
+					allDriverArray = responseJson.response;				
+					window.location.href = "#listDriver";
+				}				
+			 }
+
+
+			 
+			 function authenticateUser(responseJson){
+                var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
+                //var urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+                makeAjaxCall(urlGetAllDriver,"getAllDriver");
+
+			 }
+			 
+			 function updateDriver(responseJson){
+				 if(responseJson.status == "Success"){
+					allDriverArray.push(responseJson.response);
+					window.location.href = "#listDriver";			
+				 }
+				 else{
+				 
+				 }
+			 
+			 }
+			 
+			 function makeAjaxCall(urlHost,func){
+			 
+				
+					 $.ajax({
+								   type: "GET",
+								   url:urlHost,		  
+								   crossDomain: true,								 
+								   success: function (data) {
+								    
+								
+								switch(func){
+										case "authenticate":
+											authenticateUser(data);
+										break;
+										
+										case "getAllDriver":
+											getAllDriver(data);
+										break;
+										
+										case "updateDriver":
+										updateDriver(data);
+										break;
+
+                                        default:
+							
+							
+								}
+
+						},
+						 error: function(xhr, textStatus, errorThrown){
+						   alert(xhr + ' request failed' + textStatus + errorThrown);
+						}
+				});
+			 
+			 }
+			 
+		
+			 
+		$(document).on("ready",function(){		
+			 
+
+
+            
+			 // EVENT FOR LIST DRIVER FOR POPULATING LIST OF DRIVER
+			  $('#listDriver').on('pagebeforeshow', function() {
+             
+               
+				
+				for(var i = 0; i < allDriverArray.length; i++){
+						nameDriver = allDriverArray[i].username;
+						$("#allDriverList").append("<li><a href='#driverSchedule'>"+nameDriver+"</a></li>");
+					}					
+					$('#allDriverList').listview('refresh');
+             
+             
+             });
+			 
+			 // EVENT ENDED
+			 
+			 $("#signInPage").on('pageinit',function(){             
+                document.addEventListener("deviceready", onDeviceReady, true);
+             
+             });
+
+
+			// BINDING SIGN IN EVENT
+			$("#signInForm").on("submit",function(e){
+				var selectedRole = $( "#select-native-18 option:selected" ).text();
+				e.preventDefault();
+				if(selectedRole == "Manager"){
+					var url = ""; 
+					var username = $("#userName").val();
+					var password = $("#password").val();
+					//alert(device.uuid);
+                    
+                    
+					//var url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Manager&imei=420";
+					var url2 = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
+					makeAjaxCall(url2,"authenticate");
+			
+				}
+				else{
+					window.location.href = "#driverSchedule";
+				}						
+			});
+
+			// BINDING CREATE USER FORM
+			$("#createUser").on("submit",function(e){
+				e.preventDefault();
+				username = $("#createUserName").val();
+				password = $("#createPassword").val();
+				role = $("#createRole option:selected").text();
+				//var url = "http://localhost:82/test_site/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
+				var url = "http://onecalljunkhaul.com/custom-webservices/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
+				makeAjaxCall(url,"updateDriver");
+			
+			
+			
+			});
+			
+			
+			
+				// type of cash
+				$("#ddlType").on("change",function(){
+					cashType = $(this).val();
+					if(cashType == "voucher"){
+						$("#typeVoucher").append("<fieldset data-transition='slidedown' data-role='controlgroup'><legend>Vouhcer type</legend><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2a' value='on' checked='checked'><label for='radio-choice-v-2a'>Groupon $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2b' value='off'><label for='radio-choice-v-2b'>Groupon $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2c' value='other'><label for='radio-choice-v-2c'>Groupon $249</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2d' value='other'><label for='radio-choice-v-2d'>Living Social $99</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2e' value='other'><label for='radio-choice-v-2e'> Living Social $189</label><input type='radio' name='radio-choice-v-2' id='radio-choice-v-2f' value='other'><label for='radio-choice-v-2f'>Living social $249</label> </fieldset>").slideDown(9000);
+						$('#stopJob').trigger('create');
+					}
+					else{
+						$("#typeVoucher").empty();						
+					}
+				});
+		});	
+	</script>
+	
+  </head>
+  
+  <body onload="init();">
+	<!-- Start of first page -->
+<div data-role="page" id="signInPage">
+
+	<div data-role="header" data-theme="a" role="banner">
+		<h1>One Call Junk Haul</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<form action="form.php" id="signInForm" method="post">
+			<label for="user">User Name</label>
+    		<input type="text" name="name" id="userName" value=""  />
+    		<label for="basic">Password</label>			
+			<input type="password" name="name" id="password" value=""  />
+			<div data-role="fieldcontain">			
+				<label for="select-choice-a" class="select">Role</label>
+				<select name="select-choice-a" id="select-native-18" data-native-menu="false">
+					<option>Select Role</option>
+					<option value="1">Manager</option>
+					<option value="2">Driver</option>	
+				</select>
+			</div>			
+    		<input type="submit" data-icon="check" data-theme="b" value="Submit"/>		
+		</form>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+
+<div data-role="page" id="createUser">
+
+	<div data-role="header" data-theme="a" role="banner" data-id="fixNavbar">
+		<h1>One Call Junk Haul</h1>
+		 <a data-role="button" data-rel="back" data-icon="back">Back</a>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<form action="form.php" id="createUserForm" method="post">
+			<label for="user">User Name</label>
+    		<input type="text" name="name" id="createUserName" value=""  />
+    		<label for="basic">Password</label>			
+			<input type="password" name="name" id="createPassword" value=""  />
+			<div data-role="fieldcontain">			
+				<label for="select-choice-a" class="select">Role</label>
+				<select name="select-choice-a" id="createRole" data-native-menu="false">
+					<option>Select Role</option>
+					<option value="1">Manager</option>
+					<option value="2">Driver</option>	
+				</select>
+			</div>			
+    		<input type="submit" data-icon="check" data-theme="b" value="Submit"/>		
+		</form>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Screen for All driver -->
+<div data-role="page" id="listDriver">
+
+	<div data-role="header" data-id="fixNavbar">
+		<h1>One Call Junk Haul</h1>
+		<a data-role="button" data-rel="back" data-icon="back">Back</a>
+		<a href="#createUser" data-transition="slidedown" data-icon="check" data-theme="a">Create</a>
+	</div><!-- /header -->
+
+	<div data-role="content" id="allDriver">
+      <ul data-role='listview' data-filter='true' data-filter-placeholder='Search Drivers ...' data-inset='true' id="allDriverList">
+        
+      
+      
+      </ul>
+
+		
+	</div><!-- /content -->
+
+	<div data-role="footer" data-id="fixNavbar" data-position="fixed">
+		
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+
+
+
+<div data-role="page" id="driverSchedule">
+
+	<div data-role="header" data-id="fixNavbar">
+		<h1>Bar</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<table data-role="table" id="table-custom-2" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive" data-column-btn-theme="b" data-column-btn-text="Columns to display..." data-column-popup-theme="a">
+         <thead>
+           <tr class="ui-bar-d">
+             <th data-priority="2">#</th>
+             <th>Name</th>
+             <th data-priority="3">Date</th>
+             <th data-priority="1"><abbr title="Rotten Tomato Rating">Address</abbr></th>
+             <th data-priority="5">Contact</th>
+           </tr>
+         </thead>
+         <tbody>
+           <tr>
+             <th>1</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>74</td>
+           </tr>
+           <tr>
+             <th>2</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>64</td>
+           </tr>
+           <tr>
+             <th>3</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>87</td>
+           </tr>
+           <tr>
+             <th>4</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>87</td>
+           </tr>
+           <tr>
+             <th>5</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>87</td>
+           </tr>
+           <tr>
+             <th>6</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>74</td>
+           </tr>
+           <tr>
+             <th>7</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>122</td>
+           </tr>
+           <tr>
+             <th>8</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>72</td>
+           </tr>
+           <tr>
+             <th>9</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>85</td>
+           </tr>
+           <tr>
+             <th>10</th>
+             <td><a href="#detailJob" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>78</td>
+           </tr>
+         </tbody>
+       </table>		
+	</div><!-- /content -->
+		<div data-role="footer" data-id="fixNavbar" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#driverSchedule">Activities</a></li>
+					<li><a href="#dayEndingScreen">End Day</a></li>								
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
+	</div><!-- /page -->
+
+	<div data-role="page" id="detailJob">
+
+		<div data-role="header">
+			<h1>Bar</h1>
+		</div><!-- /header -->
+
+		<div data-role="content">
+			 <fieldset>
+
+			<div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Name</label>
+                    <input type="text" name="name" id="name" value="" placeholder="name" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Address</label>
+                    <input type="text" name="Address" id="Address" value="" placeholder="Address" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Contact</label>
+                    <input type="text" name="Contact" id="Contact" value="" placeholder="Contact" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                   <label for="textarea">Description</label>
+					<textarea cols="40" rows="40" name="description" id="description"></textarea>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+				<div id="Gallery">
+					<div class="gallery-item"><a href="images/full/001.jpg"><img src="images/thumb/001.jpg" alt="Image 01"/></a></div>
+					<a href="#test" data-role="button" data-rel="dialog" data-transition="slide" data-inline="true">View</a>
+				</div>
+			 
+			 </div>
+        </fieldset>
+		
+		<!--<div id="hidden-wrapper2">
+			<div id="text-container ">
+				<button type="reset" data-inline="true" data-theme="b">Start</button>
+			</div>
+			<div id="btn-container">
+				<button type="reset" data-inline="true" data-theme="b">Stop</button>
+			</div>        
+		</div>-->
+		
+		<div data-inline="true">
+			<a href="#stopJob" data-inline="true" data-role="button" data-theme="b">End</a>
+		</div>
+	
+		</div><!-- /content -->
+
+		<div data-role="footer" data-position="fixed">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+	</div><!-- /page -->
+	
+	
+	<!--stop job-->
+	<div data-role="page" id="stopJob">
+
+		<div data-role="header" data-theme="a" role="banner">
+			<h1>One Call Junk Haul</h1>
+		</div><!-- /header -->
+
+		<div data-role="content">
+			<div data-role="fieldcontain">
+				<label for="txtCustomerName">
+					Customer Name
+				</label>
+				<input name="customer_name" id="txtCustomerName" placeholder="Customer Name"
+				value="" type="text" data-mini="true">
+			</div>
+			<div data-role="fieldcontain">
+				<label for="txtRevenue">
+					Revenue
+				</label>
+				<input name="revenue" id="txtRevenue" placeholder="Revenue" value="" type="number"
+				data-mini="true">
+			</div>
+			<div data-role="fieldcontain">
+				<label for="ddlType">
+					Type:
+				</label>
+				<select id="ddlType" name="type" data-theme="c" data-mini="true">
+					<option value="cash">
+						Cash
+					</option>
+					<option value="check">
+						Check
+					</option>
+					<option value="cc">
+						CC
+					</option>
+					<option value="credit">
+						Credit
+					</option>
+					<option value="voucher">
+						Voucher
+					</option>
+				</select>
+			</div>
+			<div data-role="fieldcontain" id="typeVoucher">
+				
+			</div>
+			<div data-role="fieldcontain">
+				<label for="txtNotePrice">
+					How did you come up with the price?
+				</label>
+				<textarea name="end_job_note" id="txtNotePrice" placeholder="" data-mini="true"></textarea>
+			</div>
+			
+			<div data-role="fieldcontain">
+				<label for="lunchbreak">
+					Lunch Break
+				</label>
+				<input name="lunchbreak" id="lunchbreak" placeholder="Break" value="" type="number"
+				data-mini="true"/>
+			</div>
+				
+			<a id="btnBetaPhoto" data-inline="true" data-role="button" data-theme="b" href="#page1">
+				Upload Beta Photo
+			</a>
+		</div><!-- /content -->
+
+		<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of first page -->
+<div data-role="page" id="welcomeManagerScreen">
+
+	<div data-role="header" data-id="fixNavbar" data-theme="a" role="banner">
+		<h1>Activities</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+			
+	</div><!-- /content -->
+
+	<div data-role="footer" data-id="fixNavbar" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#welcomeManagerScreen">Driver</a></li>
+					<li><a href="#welcomeManagerScreen2">Activities</a></li>								
+				</ul>
+			</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<div data-role="page" id="welcomeManagerScreen2">
+
+	<div data-role="header" data-id="fixNavbar" data-theme="a" role="banner">
+		<h1>Activities</h1>
+	</div><!-- /header -->
+
+<div data-role="content">
+	
+	<table data-role="table" id="table-custom-2" data-mode="columntoggle" class="ui-body-d ui-shadow table-stripe ui-responsive" data-column-btn-theme="b" data-column-btn-text="Columns to display..." data-column-popup-theme="a">
+         <thead>
+           <tr class="ui-bar-d">
+             <th data-priority="2">#</th>
+             <th>Name</th>
+             <th data-priority="3">Date</th>
+             <th data-priority="1"><abbr title="Rotten Tomato Rating">Address</abbr></th>
+             <th data-priority="5">Contact</th>
+           </tr>
+         </thead>
+         <tbody>
+           <tr>
+             <th>1</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>74</td>
+           </tr>
+           <tr>
+             <th>2</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>64</td>
+           </tr>
+           <tr>
+             <th>3</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>87</td>
+           </tr>
+           <tr>
+             <th>4</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>87</td>
+           </tr>
+           <tr>
+             <th>5</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>87</td>
+           </tr>
+           <tr>
+             <th>6</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>74</td>
+           </tr>
+           <tr>
+             <th>7</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>122</td>
+           </tr>
+           <tr>
+             <th>8</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>72</td>
+           </tr>
+           <tr>
+             <th>9</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>85</td>
+           </tr>
+           <tr>
+             <th>10</th>
+             <td><a href="#jobDetailManager" data-rel="external">Name A</a></td>
+             <td>sample Date</td>
+             <td>sample Address</td>
+             <td>78</td>
+           </tr>
+         </tbody>
+       </table>		
+	</div><!-- /content -->
+			<div data-role="footer" data-id="fixNavbar" data-position="fixed">
+					<div data-role="navbar">
+						<ul>
+							<li><a href="#welcomeManagerScreen">Driver</a></li>
+							<li><a href="#welcomeManagerScreen2">Activities</a></li>													
+						</ul>
+					</div><!-- /navbar -->
+			</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of first page -->
+<div data-role="page" id="test">
+
+	<div data-role="header" data-id="fixNavbar" data-theme="a" role="banner">
+		<h1>Activities</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+			<div class="gallery-item"><a href="images/full/001.jpg"><img src="images/full/001.jpg" alt="Image 01"/></a></div>
+	</div><!-- /content -->
+
+	
+</div><!-- /page -->
+	
+	
+	
+	
+
+
+<div data-role="page" id="jobDetailManager">
+
+		<div data-role="header">
+			<h1>Bar</h1>
+		</div><!-- /header -->
+
+		<div data-role="content">
+			 <fieldset>
+
+			<div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Name</label>
+                    <input type="text" name="name" id="name" value="" placeholder="name" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Address</label>
+                    <input type="text" name="Address" id="Address" value="" placeholder="Address" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Contact</label>
+                    <input type="text" name="Contact" id="Contact" value="" placeholder="Contact" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                   <label for="textarea">Description</label>
+					<textarea cols="40" rows="40" name="description" id="description"></textarea>
+             </div>			 
+			 
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                   <a id="btnBetaPhoto" data-inline="true" data-role="button" data-theme="b" href="#page1">
+						Upload Alpha Photo
+					</a>
+            </div>
+			 
+			 <div data-role="collapsible" data-theme="b" data-content-theme="c">
+				<h2>Choose a driver...</h2>
+				<ul data-role="listview" data-filter="true">
+					<li><a href="#driverSchedule">Chris</a></li>
+					<li><a href="#driverSchedule">Herri</a></li>
+					<li><a href="#driverSchedule">Will</a></li>
+					<li><a href="#driverSchedule">Jhon</a></li>
+					<li><a href="#driverSchedule">Joseph</a></li>
+					<li><a href="#driverSchedule">Josh</a></li>
+				</ul>
+			</div>
+			
+        </fieldset>
+		
+		<!--<div id="hidden-wrapper2">
+			<div id="text-container ">
+				<button type="reset" data-inline="true" data-theme="b">Start</button>
+			</div>
+			<div id="btn-container">
+				<button type="reset" data-inline="true" data-theme="b">Stop</button>
+			</div>        
+		</div>-->		
+		</div><!-- /content -->
+
+		<div data-role="footer" data-position="fixed">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+	</div><!-- /page -->	
+	
+	<!-- Day ending page for driver -->
+	<div data-role="page" id="dayEndingScreen" data-postion = "fixed">
+
+		<div data-role="header">
+			<h1>Bar</h1>
+		</div><!-- /header -->
+
+		<div data-role="content">
+			 <fieldset>
+
+			<div data-role="fieldcontain" class = "ui-hide-label">                  
+					<label for="birth-place">Disposal Weight</label>
+                    <input type="text" name="disposalWeight" id="disposalWeight" value="" placeholder="Disposal Weight"/>
+             </div>
+			<div data-role="fieldcontain" class = "ui-hide-label">                  
+					<label for="birth-place">Invoice Number</label>
+                    <input type="text" name="invoiceNumber" id="invoiceNumber" value="" placeholder="Invoice Number"/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Gas</label>
+                    <input type="text" name="gas" id="gas" value="" placeholder="Gas"/>
+             </div>
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Tolls</label>
+                    <input type="text" name="tolls" id="tolls" value="" placeholder="Tolls"/>
+             </div>
+			  <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Disposal Expense</label>
+                    <input type="text" name="disposalExpense" id="disposalExpense" value="" placeholder="Disposal Expense"/>
+             </div>
+			  <div data-role="fieldcontain" class = "ui-hide-label">
+                    <label for="birth-place">Other Expense</label>
+                    <input type="text" name="otherExpense" id="otherExpense" value="" placeholder="Other Expense"/>
+             </div>			 
+			 
+			 <div data-role="fieldcontain" class = "ui-hide-label">
+                   <a id="btnDayEnd" data-role="button" data-inline="true" data-theme="b" href="#page1">
+						End
+					</a>
+            </div>		
+        </fieldset>
+		
+		<!--<div id="hidden-wrapper2">
+			<div id="text-container ">
+				<button type="reset" data-inline="true" data-theme="b">Start</button>
+			</div>
+			<div id="btn-container">
+				<button type="reset" data-inline="true" data-theme="b">Stop</button>
+			</div>        
+		</div>-->		
+		</div><!-- /content -->
+
+		<div data-role="footer" data-id="fixNavbar" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#driverSchedule">Activities</a></li>
+					<li><a href="#dayEndingScreen">End Day</a></li>								
+				</ul>
+			</div><!-- /navbar -->
+		</div><!-- /footer -->
+	</div><!-- /page -->	
+<!--  	<script type="text/javascript" charset="utf-8" src="index.js"></script> -->
+	<script type="text/javascript" charset="utf-8" src="apis/accelerometer.js"></script>
+ 	<script type="text/javascript" charset="utf-8" src="apis/camera.js"></script>
+ 	<script type="text/javascript" charset="utf-8" src="apis/capture.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/compass.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/connection.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/contacts.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/device.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/events.js"></script>
+ 	<script type="text/javascript" charset="utf-8" src="apis/file.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/geolocation.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/media.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/notification.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/storage.js"></script>			
+  </body>
+</html>
