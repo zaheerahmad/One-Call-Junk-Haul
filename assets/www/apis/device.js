@@ -34,7 +34,7 @@ function onBackbutton() {
 }
 var onDeviceReady = function() {
     console.log("deviceready event fired");
-    alert(device.uuid);
+    
  
 };
 
