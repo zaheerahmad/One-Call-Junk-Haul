@@ -34,14 +34,22 @@
 					allDriverArray = responseJson.response;	
 					//$.mobile.loadPage("#listDriver");								
 					//window.location.href = "#listDriver";				
-				}				
-				$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });
+				}
+				var userRole = localStorage.getItem('userRole');
+				if(userRole == 'Manager'){
+					$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });
+				}
+				else if(userRole == 'Driver'){
+					
+					$(":mobile-pagecontainer").pagecontainer("change", "#driverSchedule", { });
+				}
+			 
 			 }
 
 
 			 
 			 function authenticateUser(responseJson){
-                var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
+				var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
                 //var urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
                 makeAjaxCall(urlGetAllDriver,"getAllDriver");
 
@@ -51,8 +59,8 @@
 			 function getAllActiveJobs(responseJson){
 				if(responseJson.status == "Success"){
 					activeJobs = responseJson.response;
-					for(var i = 0;i < activeJobs.length; i++){
-						$('#allActivities').append("<div data-role='collapsible' class='ui-collapsible  ui-collapsible-inset ui-collapsible-themed-content'><h2 class='ui-collapsible-heading'><a href='#' class='ui-collapsible-heading-toggle ui-btn ui-btn-icon-left ui-btn-up-b' data-corners='false' data-shadow='false' data-iconshadow='true' data-wrapperels='span' data-icon='plus' data-iconpos='left' data-theme='b'><span class='ui-btn-inner'><span class='ui-btn-text'>"+activeJobs[i].title+"<span class='ui-collapsible-heading-status'> click to collapse contents</span></span><span class='ui-icon ui-icon-shadow ui-icon-minus'>&nbsp;</span></span></a></h2><div class='ui-collapsible-content ui-body-d' aria-hidden='false'><li data-role='list-divider' role='heading' class='ui-li ui-li-divider ui-bar-d ui-li-has-count ui-first-child'>Friday, October 8, 2010 <span class='ui-li-count ui-btn-up-c ui-btn-corner-all'>2</span></li><li data-corners='false' data-shadow='false' data-iconshadow='true' data-wrapperels='div' data-icon='arrow-r' data-iconpos='right' data-theme='d' class='ui-btn ui-btn-up-d ui-btn-icon-right ui-li-has-arrow ui-li'><div class='ui-btn-inner ui-li'><div class='ui-btn-text'><a href='#' class='ui-link-inherit'><p class='ui-li-aside ui-li-desc'><strong>6:24</strong>PM</p><h3 class='ui-li-heading'>"+activeJobs[i].title+"</h3><p class='ui-li-desc'><strong>"+activeJobs[i].description+"</strong></p><p class='ui-li-desc'>"+activeJobs[i].customerName+"</p></a></div><span class='ui-icon ui-icon-arrow-r ui-icon-shadow'>&nbsp;</span></div></li></div>");
+					for(var i = 0;i < activeJobs.length; i++){					
+						$('#allActivities').append("<div data-role='collapsible'><h2>"+activeJobs[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html'><h3>"+activeJobs[i].title+"</h3><p><strong>"+activeJobs[i].description+"</strong></p><p>"+activeJobs[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
 				
 					}
 					$('#getAllActiveJobsForm').trigger("create");
@@ -166,6 +174,7 @@
 			// BINDING SIGN IN EVENT
 			$("#signInForm").on("submit",function(e){
 				var selectedRole = $( "#select-native-18 option:selected" ).text();
+				localStorage.setItem('userRole',selectedRole);
 				e.preventDefault();
 				if(selectedRole == "Manager"){
 					var url = ""; 
@@ -267,7 +276,10 @@
 	</div><!-- /header -->
 
 		<div data-role="content" id="allActivities">
-					
+			<div data-role="collapsible-set" id="allActivities" data-theme="a" data-content-theme="b">
+			
+			
+			</div>
 						
 		
 		</div><!-- /content -->
@@ -356,8 +368,8 @@
 
 <div data-role="page" id="driverSchedule">
 
-	<div data-role="header" data-id="fixNavbar">
-		<h1>Bar</h1>
+	<div data-role="header" data-position = "fixed" data-id="fixNavbar">
+		<h1>One Call Junk Haul</h1>
 	</div><!-- /header -->
 
 	<div data-role="content">
