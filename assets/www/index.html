@@ -6,10 +6,16 @@
     <title></title>
 
 	<script type="text/javascript" charset="utf-8" src="phonegap-1.4.1.js"></script>
-	<link rel="stylesheet" href="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.css" />
-	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-	<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	<!--<link rel="stylesheet" href="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.css" />-->
+	<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />-->
+	<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>-->
+	<!--<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>-->
 	<link rel="stylesheet" href="index.css" /> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>	
+	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	
 	<script type="text/javascript" charset="utf-8" src="phonegap-1.4.1.js"></script>
 	<script type="text/javascript" charset="utf-8">
 	     var text;
@@ -25,9 +31,11 @@
 			 
 			 function getAllDriver(responseJson){				
 				if(responseJson.status == 'Success'){                 
-					allDriverArray = responseJson.response;				
-					window.location.href = "#listDriver";
+					allDriverArray = responseJson.response;	
+					//$.mobile.loadPage("#listDriver");								
+					//window.location.href = "#listDriver";				
 				}				
+				$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });
 			 }
 
 
@@ -39,10 +47,25 @@
 
 			 }
 			 
+			 	 
+			 function getAllActiveJobs(responseJson){
+				if(responseJson.status == "Success"){
+					activeJobs = responseJson.response;
+					for(var i = 0;i < activeJobs.length; i++){
+						$('#allActivities').append("<div data-role='collapsible' class='ui-collapsible  ui-collapsible-inset ui-collapsible-themed-content'><h2 class='ui-collapsible-heading'><a href='#' class='ui-collapsible-heading-toggle ui-btn ui-btn-icon-left ui-btn-up-b' data-corners='false' data-shadow='false' data-iconshadow='true' data-wrapperels='span' data-icon='plus' data-iconpos='left' data-theme='b'><span class='ui-btn-inner'><span class='ui-btn-text'>"+activeJobs[i].title+"<span class='ui-collapsible-heading-status'> click to collapse contents</span></span><span class='ui-icon ui-icon-shadow ui-icon-minus'>&nbsp;</span></span></a></h2><div class='ui-collapsible-content ui-body-d' aria-hidden='false'><li data-role='list-divider' role='heading' class='ui-li ui-li-divider ui-bar-d ui-li-has-count ui-first-child'>Friday, October 8, 2010 <span class='ui-li-count ui-btn-up-c ui-btn-corner-all'>2</span></li><li data-corners='false' data-shadow='false' data-iconshadow='true' data-wrapperels='div' data-icon='arrow-r' data-iconpos='right' data-theme='d' class='ui-btn ui-btn-up-d ui-btn-icon-right ui-li-has-arrow ui-li'><div class='ui-btn-inner ui-li'><div class='ui-btn-text'><a href='#' class='ui-link-inherit'><p class='ui-li-aside ui-li-desc'><strong>6:24</strong>PM</p><h3 class='ui-li-heading'>"+activeJobs[i].title+"</h3><p class='ui-li-desc'><strong>"+activeJobs[i].description+"</strong></p><p class='ui-li-desc'>"+activeJobs[i].customerName+"</p></a></div><span class='ui-icon ui-icon-arrow-r ui-icon-shadow'>&nbsp;</span></div></li></div>");
+				
+					}
+					$('#getAllActiveJobsForm').trigger("create");
+				
+				}
+			 
+			 }
+			 
 			 function updateDriver(responseJson){
 				 if(responseJson.status == "Success"){
-					allDriverArray.push(responseJson.response);
-					window.location.href = "#listDriver";			
+					allDriverArray.push(responseJson.response);					
+					//$.mobile.loadPage("#listDriver");	
+					$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });					
 				 }
 				 else{
 				 
@@ -55,7 +78,9 @@
 				
 					 $.ajax({
 								   type: "GET",
-								   url:urlHost,		  
+								   url:urlHost,
+									cache: true,
+									async:true,
 								   crossDomain: true,								 
 								   success: function (data) {
 								    
@@ -72,6 +97,10 @@
 										case "updateDriver":
 										updateDriver(data);
 										break;
+										
+										case "getAllActiveJobs":
+											getAllActiveJobs(data);
+										break;
 
                                         default:
 							
@@ -80,7 +109,7 @@
 
 						},
 						 error: function(xhr, textStatus, errorThrown){
-						   alert(xhr + ' request failed' + textStatus + errorThrown);
+						   alert("No network connection found");
 						}
 				});
 			 
@@ -90,22 +119,41 @@
 			 
 		$(document).on("ready",function(){		
 			 
-
+			$(document).ajaxStart(function() {				
+				 $.mobile.loading('show');
+			});
+			
+			$(document).ajaxStop(function() {
+				 $.mobile.loading('hide');
+			});
 
             
 			 // EVENT FOR LIST DRIVER FOR POPULATING LIST OF DRIVER
 			  $('#listDriver').on('pagebeforeshow', function() {
-             
+				$("#allDriverList").html('');
                
 				
 				for(var i = 0; i < allDriverArray.length; i++){
 						nameDriver = allDriverArray[i].username;
-						$("#allDriverList").append("<li><a href='#driverSchedule'>"+nameDriver+"</a></li>");
+						$("#allDriverList").append("<li><a href=''>"+nameDriver+"</a></li>");
 					}					
 					$('#allDriverList').listview('refresh');
              
              
              });
+			 
+			 
+			 // EVENT BINDING FOR GETTING AT ACTIVE JOB EVENTS
+			 $("#getAllActiveJobsForm").on('pagebeforeshow',function(){             
+                $('#allActivities').html('');
+				//var url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
+				var url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';
+				makeAjaxCall(url,'getAllActiveJobs');				
+             
+             });
+			// EVENT ENDED
+			 
+			 
 			 
 			 // EVENT ENDED
 			 
@@ -127,12 +175,12 @@
                     
                     
 					//var url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Manager&imei=420";
-					var url2 = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
-					makeAjaxCall(url2,"authenticate");
+					var url = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
+					makeAjaxCall(url,"authenticate");
 			
 				}
 				else{
-					window.location.href = "#driverSchedule";
+					alert("Please select manager for now ..");
 				}						
 			});
 
@@ -141,6 +189,14 @@
 				e.preventDefault();
 				username = $("#createUserName").val();
 				password = $("#createPassword").val();
+				confirmPassword = $("#confirmCreatePassword").val();
+				
+				if(password != confirmPassword){
+					alert("Password dosen't match ..");
+					return;
+				
+				}
+				
 				role = $("#createRole option:selected").text();
 				//var url = "http://localhost:82/test_site/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
 				var url = "http://onecalljunkhaul.com/custom-webservices/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
@@ -170,9 +226,9 @@
   
   <body onload="init();">
 	<!-- Start of first page -->
-<div data-role="page" id="signInPage">
+<div data-role="page"  id="signInPage">
 
-	<div data-role="header" data-theme="a" role="banner" data-position="fixed">
+	<div data-role="header" data-theme="b" role="banner" data-position="fixed">
 		<h1>One Call Junk Haul</h1>
 	</div><!-- /header -->
 
@@ -194,7 +250,7 @@
 		</form>
 	</div><!-- /content -->
 
-	<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
+	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
@@ -202,10 +258,39 @@
 
 
 
+
+
+<div data-role="page"  id="getAllActiveJobsForm">
+
+	<div data-role="header" data-theme="b" role="banner">
+		<h1>One Call Junk Haul</h1>
+	</div><!-- /header -->
+
+		<div data-role="content" id="allActivities">
+					
+						
+		
+		</div><!-- /content -->
+	
+	<div data-role="footer" data-theme = "b" data-id="fixNavbar" data-position="fixed">
+		<div data-role="navbar">
+				<ul>
+					<li><a href="#listDriver">Driver</a></li>
+					<li><a href="#getAllActiveJobsForm">Activities</a></li>								
+				</ul>
+		</div><!-- /navbar -->		
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+
+
+
 <div data-role="page" id="createUser">
 
-	<div data-role="header" data-theme="a" role="banner" data-position="fixed" data-id="fixNavbar">
-		<h1>One Call Junk Haul</h1>
+	<div data-role="header" data-theme="b" role="banner" data-position="fixed" data-id="fixNavbar">
+		<h1>Create User</h1>
 		 <a data-role="button" data-rel="back" data-icon="back">Back</a>
 	</div><!-- /header -->
 
@@ -214,7 +299,9 @@
 			<label for="user">User Name</label>
     		<input type="text" name="name" id="createUserName" value=""  />
     		<label for="basic">Password</label>			
-			<input type="password" name="name" id="createPassword" value=""  />
+			<input type="text" name="name" id="createPassword" value=""  />
+			<label for="basic">Confrim Password</label>			
+			<input type="text" name="name" id="confirmCreatePassword" value=""  />
 			<div data-role="fieldcontain">			
 				<label for="select-choice-a" class="select">Role</label>
 				<select name="select-choice-a" id="createRole" data-native-menu="false">
@@ -227,7 +314,7 @@
 		</form>
 	</div><!-- /content -->
 
-	<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
+	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
@@ -236,10 +323,10 @@
 <!-- Screen for All driver -->
 <div data-role="page" id="listDriver">
 
-	<div data-role="header" data-id="fixNavbar" data-position="fixed">
+	<div data-role="header" data-id="fixNavbar" data-theme = "b" data-position="fixed">
 		<h1>One Call Junk Haul</h1>
 		<a data-role="button" data-rel="back" data-icon="back">Back</a>
-		<a href="#createUser" data-transition="slidedown" data-icon="check" data-theme="a">Create</a>
+		<a href="#createUser" data-transition="slidedown" data-icon="check">Create</a>
 	</div><!-- /header -->
 
 	<div data-role="content" id="allDriver">
@@ -252,8 +339,13 @@
 		
 	</div><!-- /content -->
 
-	<div data-role="footer" data-id="fixNavbar" data-position="fixed">
-		
+	<div data-role="footer" data-id="fixNavbar" data-theme = "b" data-position="fixed">
+		<div data-role="navbar">
+				<ul>
+					<li><a href="#listDriver">Driver</a></li>
+					<li><a href="#getAllActiveJobsForm">Activities</a></li>								
+				</ul>
+		</div><!-- /navbar -->		
 	</div><!-- /footer -->
 </div><!-- /page -->
 
