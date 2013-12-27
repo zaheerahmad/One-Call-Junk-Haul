@@ -20,6 +20,8 @@
 	<script type="text/javascript" charset="utf-8">
 	     var text;
          var allDriverArray;
+		 var allActiveJobsArray;
+		 var selectedAcitvity;
          var uuid;
 			
 		var responseData;
@@ -58,12 +60,31 @@
 			 	 
 			 function getAllActiveJobs(responseJson){
 				if(responseJson.status == "Success"){
-					activeJobs = responseJson.response;
-					for(var i = 0;i < activeJobs.length; i++){					
-						$('#allActivities').append("<div data-role='collapsible'><h2>"+activeJobs[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html'><h3>"+activeJobs[i].title+"</h3><p><strong>"+activeJobs[i].description+"</strong></p><p>"+activeJobs[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+					allActiveJobsArray = responseJson.response;
+					for(var i = 0;i < allActiveJobsArray.length; i++){					
+						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
 				
 					}
 					$('#getAllActiveJobsForm').trigger("create");
+					$("a.assignJob").on("click",function(e){
+						e.preventDefault();
+						var activityId = $(this).attr('id');
+						
+						for(var i = 0; i < allActiveJobsArray.length; i++){
+							if(activityId == allActiveJobsArray[i].activityId){
+								selectedActivity = allActiveJobsArray[i];
+								break;
+							
+							}
+						
+						}
+						
+						$(":mobile-pagecontainer").pagecontainer("change", "#detailJob", { });
+						
+					
+					
+					
+				});
 				
 				}
 			 
@@ -156,14 +177,37 @@
                 $('#allActivities').html('');
 				//var url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
 				var url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';
-				makeAjaxCall(url,'getAllActiveJobs');				
+				makeAjaxCall(url,'getAllActiveJobs');
+				
              
              });
 			// EVENT ENDED
+			 $("#getAllActiveJobsForm").on('pageinit',function(){             
+				   // BINDING EVENT FOR ASSIGNING JOB
+					
+				
+				
+				//EVENT ENDED			
+             
+             });
+			
+			
+			
+			
 			 
 			 
 			 
-			 // EVENT ENDED
+			 // EVENT BINDING FOR SHOWING DETAIL OF ACTIVITY/JOB
+			 $("#detailJob").on('pagebeforeshow',function(){
+				$("#customerName").val(selectedActivity.title);
+				$("#activityDescription").text(selectedActivity.description);
+			 
+			 
+			 });
+			 
+			 
+			 
+			 //EVENT ENDED
 			 
 			 $("#signInPage").on('pageinit',function(){             
                 document.addEventListener("deviceready", onDeviceReady, true);
@@ -469,28 +513,28 @@
 
 	<div data-role="page" id="detailJob">
 
-		<div data-role="header">
-			<h1>Bar</h1>
+		<div data-role="header" data-theme = "b" data-postion = "fixed">
+			<h1>One Call Junk Haul</h1>
 		</div><!-- /header -->
 
 		<div data-role="content">
 			 <fieldset>
 
 			<div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Name</label>
-                    <input type="text" name="name" id="name" value="" placeholder="name" disable/>
+                    <label for="birth-place">Customer Name</label>
+                    <input type="text" name="name" id="customerName" value="" placeholder="name" disable/>
              </div>
 			 <div data-role="fieldcontain" class = "ui-hide-label">
                     <label for="birth-place">Address</label>
-                    <input type="text" name="Address" id="Address" value="" placeholder="Address" disable/>
+                    <input type="text" name="Address" id="customerAddress" value="" placeholder="Address" disable/>
              </div>
 			 <div data-role="fieldcontain" class = "ui-hide-label">
                     <label for="birth-place">Contact</label>
-                    <input type="text" name="Contact" id="Contact" value="" placeholder="Contact" disable/>
+                    <input type="text" name="Contact" id="customerContact" value="" placeholder="Contact" disable/>
              </div>
 			 <div data-role="fieldcontain" class = "ui-hide-label">
                    <label for="textarea">Description</label>
-					<textarea cols="40" rows="40" name="description" id="description"></textarea>
+					<textarea cols="40" rows="40" name="activityDescription" id="activityDescription"></textarea>
              </div>
 			 <div data-role="fieldcontain" class = "ui-hide-label">
 				<div id="Gallery">
@@ -516,7 +560,7 @@
 	
 		</div><!-- /content -->
 
-		<div data-role="footer" data-position="fixed">
+		<div data-role="footer" data-theme = "b" data-position="fixed">
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
 	</div><!-- /page -->
