@@ -116,16 +116,15 @@
 			 
 			 }
 			 
-			 function updateDriver(responseJson){
+			 function createUser(responseJson){
 				 if(responseJson.status == "Success"){
-					allDriverArray.push(responseJson.response);					
-					//$.mobile.loadPage("#listDriver");	
+					allDriverArray.push(responseJson.response);
+					alert(responseJson.message);
 					$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });					
 				 }
 				 else{
-				 
-				 }
-			 
+				     alert(responseJson.message);
+				 }			 
 			 }
 			 
 			 function makeAjaxCall(urlHost,func,pageName){
@@ -150,8 +149,8 @@
 											switchPage(pageName);
 										break;
 										
-										case "updateDriver":
-											updateDriver(data);
+										case "createUser":
+											createUser(data);
 										break;
 										
 										case "getAllActiveJobs":
@@ -222,6 +221,13 @@
              
              });
 			
+			// CLEAR FORM WHEN USER IS CREATED 
+			$("#createUser").on('pagebeforehide',function(){
+					$("#createUserName").val('');
+					$("#createPassword").val('');
+					$("#confirmCreatePassword").val('');			
+			});
+			// EVENT ENDED
 			
 			
 			
@@ -255,6 +261,10 @@
 					var url = ""; 
 					var username = $("#userName").val();
 					var password = $("#password").val();
+					if(username == "" && password == ""){
+						alert("Username/Password cannot be empty .. ");
+						
+					}
 					//alert(device.uuid);
                     
                     
@@ -284,7 +294,7 @@
 				role = $("#createRole option:selected").text();
 				//var url = "http://localhost:82/test_site/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
 				var url = "http://onecalljunkhaul.com/custom-webservices/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
-				makeAjaxCall(url,"updateDriver");
+				makeAjaxCall(url,"createUser");
 			
 			
 			
@@ -324,8 +334,8 @@
 						var driverId = $(this).attr('id');
 						var url = "";
 						
-						//var url = "http://localhost:82/test_site/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;
-						var url = "http://onecalljunkhaul.com/custom-webservices/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.personId;
+						//var url = "http://localhost:82/test_site/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;						
+						var url = "http://onecalljunkhaul.com/custom-webservices/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;
 						
 						
 						 makeAjaxCall(url,"assignJobToDriver","");
