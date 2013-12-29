@@ -9,14 +9,15 @@
 	<!--<link rel="stylesheet" href="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.css" />-->
 	<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />-->
 	<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>-->
-	<!--<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>-->
+	<!--<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>-->
+	<!--<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>-->
 	<link rel="stylesheet" href="index.css" /> 
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<!--<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>-->
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
-	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>	
 	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
 	
-	<script type="text/javascript" charset="utf-8" src="phonegap-1.4.1.js"></script>
+	
 	<script type="text/javascript" charset="utf-8">
 	     var text;
          var allDriverArray;
@@ -25,26 +26,46 @@
          var uuid;
 			
 		var responseData;
-           
-
+			function assignJobToDriver(responseData){
+				if(responseData.status == "success"){
+					alert(responseData.message);				
+				}
+				else{
+					alert(responseData.message);
+				}
+			
+			
+			}
+		   
+		   
+		   
+			function switchPage(nameOfPage){
+					var userRole = localStorage.getItem('userRole');
+					if(nameOfPage != ""){
+						$(":mobile-pagecontainer").pagecontainer("change",nameOfPage, { });
+					}
+			/*		if(userRole == 'Manager'){
+						$(":mobile-pagecontainer").pagecontainer("change",nameOfPage, { });
+					}
+					else if(userRole == 'Driver'){
+						
+						$(":mobile-pagecontainer").pagecontainer("change", "#driverSchedule", { });
+					}			*/
+			
+			}
 
 
 
 			 
-			 function getAllDriver(responseJson){				
+			 function getAllDriver(responseJson,nameOfPage){				
 				if(responseJson.status == 'Success'){                 
 					allDriverArray = responseJson.response;	
 					//$.mobile.loadPage("#listDriver");								
 					//window.location.href = "#listDriver";				
 				}
-				var userRole = localStorage.getItem('userRole');
-				if(userRole == 'Manager'){
-					$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });
-				}
-				else if(userRole == 'Driver'){
-					
-					$(":mobile-pagecontainer").pagecontainer("change", "#driverSchedule", { });
-				}
+			
+			
+				
 			 
 			 }
 
@@ -53,8 +74,13 @@
 			 function authenticateUser(responseJson){
 				var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
                 //var urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
-                makeAjaxCall(urlGetAllDriver,"getAllDriver");
-
+				if(responseJson.status == "Success"){
+					makeAjaxCall(urlGetAllDriver,"getAllDriver","#listDriver");
+				}
+				else{
+					alert(responseJson.message);
+				}
+				
 			 }
 			 
 			 	 
@@ -79,7 +105,7 @@
 						
 						}
 						
-						$(":mobile-pagecontainer").pagecontainer("change", "#detailJob", { });
+						$(":mobile-pagecontainer").pagecontainer("change", "#jobDetailManager", { });
 						
 					
 					
@@ -102,7 +128,7 @@
 			 
 			 }
 			 
-			 function makeAjaxCall(urlHost,func){
+			 function makeAjaxCall(urlHost,func,pageName){
 			 
 				
 					 $.ajax({
@@ -121,14 +147,19 @@
 										
 										case "getAllDriver":
 											getAllDriver(data);
+											switchPage(pageName);
 										break;
 										
 										case "updateDriver":
-										updateDriver(data);
+											updateDriver(data);
 										break;
 										
 										case "getAllActiveJobs":
 											getAllActiveJobs(data);
+										break;
+										
+										case "assignJobToDriver":
+											assignJobToDriver(data);
 										break;
 
                                         default:
@@ -173,7 +204,7 @@
 			 
 			 
 			 // EVENT BINDING FOR GETTING AT ACTIVE JOB EVENTS
-			 $("#getAllActiveJobsForm").on('pagebeforeshow',function(){             
+			 $("#getAllActiveJobsForm").on('pageinit',function(){             
                 $('#allActivities').html('');
 				//var url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
 				var url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';
@@ -198,9 +229,9 @@
 			 
 			 
 			 // EVENT BINDING FOR SHOWING DETAIL OF ACTIVITY/JOB
-			 $("#detailJob").on('pagebeforeshow',function(){
-				$("#customerName").val(selectedActivity.title);
-				$("#activityDescription").text(selectedActivity.description);
+			 $("#jobDetailManager").on('pagebeforeshow',function(){
+				$("#customerNameManager").val(selectedActivity.title);
+				$("#activityDescriptionManager").text(selectedActivity.description);
 			 
 			 
 			 });
@@ -229,7 +260,7 @@
                     
 					//var url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Manager&imei=420";
 					var url = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
-					makeAjaxCall(url,"authenticate");
+					makeAjaxCall(url,"authenticate","");
 			
 				}
 				else{
@@ -272,6 +303,41 @@
 						$("#typeVoucher").empty();						
 					}
 				});
+				
+				
+				// EVENT BINDING FOR SELECTING DRIVER AGAINST ANY PARTICULAR ACTIVITY
+				$("#assignJobDriver").on("collapsibleexpand",function(){
+					var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
+					//var urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+					makeAjaxCall(urlGetAllDriver,"#getAllDriver","");
+							
+					$("#assignJobDriverList").html('');             
+				
+					for(var i = 0; i < allDriverArray.length; i++){
+							nameDriver = allDriverArray[i].username;
+							$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+nameDriver+"</a></li>");
+					}					
+					$('#assignJobDriverList').listview('refresh');
+					
+					$("a.assignJobToDriver").on('click',function(e){
+						e.preventDefault();
+						var driverId = $(this).attr('id');
+						var url = "";
+						
+						//var url = "http://localhost:82/test_site/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;
+						var url = "http://onecalljunkhaul.com/custom-webservices/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.personId;
+						
+						
+						 makeAjaxCall(url,"assignJobToDriver","");
+					
+					
+					
+					});
+				
+				
+				});
+				// EVENT ENDED
+				
 		});	
 	</script>
 	
@@ -510,6 +576,9 @@
 			</div><!-- /navbar -->
 		</div><!-- /footer -->
 	</div><!-- /page -->
+	
+	
+	<!-- DETAIL PAGE TO VIEW DETAIL OF ANY GIVEN ACTIVITY  -->
 
 	<div data-role="page" id="detailJob">
 
@@ -564,6 +633,9 @@
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
 	</div><!-- /page -->
+	
+	
+	<!-- DETAIL ACTIVITY PAGE ENDED -->
 	
 	
 	<!--stop job-->
@@ -782,10 +854,10 @@
 	
 
 
-<div data-role="page" id="jobDetailManager">
+<div data-role="page" data-theme = "b" data-position = "fixed" id="jobDetailManager">
 
 		<div data-role="header">
-			<h1>Bar</h1>
+			<h1>One Call Junk Haul</h1>
 		</div><!-- /header -->
 
 		<div data-role="content">
@@ -793,7 +865,7 @@
 
 			<div data-role="fieldcontain" class = "ui-hide-label">
                     <label for="birth-place">Name</label>
-                    <input type="text" name="name" id="name" value="" placeholder="name" disable/>
+                    <input type="text" name="name" id="customerNameManager" value="" placeholder="Please enter name of customer" disable/>
              </div>
 			 <div data-role="fieldcontain" class = "ui-hide-label">
                     <label for="birth-place">Address</label>
@@ -805,7 +877,7 @@
              </div>
 			 <div data-role="fieldcontain" class = "ui-hide-label">
                    <label for="textarea">Description</label>
-					<textarea cols="40" rows="40" name="description" id="description"></textarea>
+					<textarea cols="40" rows="40" name="description" id="activityDescriptionManager"></textarea>
              </div>			 
 			 
 			 <div data-role="fieldcontain" class = "ui-hide-label">
@@ -814,15 +886,11 @@
 					</a>
             </div>
 			 
-			 <div data-role="collapsible" data-theme="b" data-content-theme="c">
+			 <div data-role="collapsible" data-theme="b" id="assignJobDriver" data-content-theme="c">
 				<h2>Choose a driver...</h2>
-				<ul data-role="listview" data-filter="true">
-					<li><a href="#driverSchedule">Chris</a></li>
-					<li><a href="#driverSchedule">Herri</a></li>
-					<li><a href="#driverSchedule">Will</a></li>
-					<li><a href="#driverSchedule">Jhon</a></li>
-					<li><a href="#driverSchedule">Joseph</a></li>
-					<li><a href="#driverSchedule">Josh</a></li>
+				<ul data-role="listview" data-theme = "b"	id="assignJobDriverList" data-filter="true">
+				
+					
 				</ul>
 			</div>
 			
