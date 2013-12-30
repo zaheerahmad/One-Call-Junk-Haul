@@ -12,6 +12,20 @@
 	<!--<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>-->
 	<!--<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>-->
 	<link rel="stylesheet" href="index.css" /> 
+	<style>
+		.modalWindow{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			z-index: 1500;
+			background: white;
+			opacity: 0.7;
+		}
+
+		.ui-loader{
+			z-index: 1501;
+		}
+	</style>
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<!--<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>-->
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
@@ -24,8 +38,7 @@
          var allDriverArray;
 		 var allActiveJobsArray;
 		 var allDriverjJob;
-		 var selectedAcitvity;
-		 var isFirstCallToAllJobs = true;
+		 var selectedAcitvity;		 
          var uuid;
 		 
 		 var isDriverFlowJobs = false;
@@ -33,6 +46,44 @@
 		var responseData;
 			
 		
+		 $(document).on("mobileinit", function(){
+			$.mobile.ajaxEnabled=false;
+			$.mobile.loadingMessage = false;
+		});       
+			
+			function showModal(){
+			  $("body").append('<div class="modalWindow"/>');
+			  //$.mobile.showPageLoadingMsg();
+			  $.mobile.loading('show');
+			 // setTimeout('hideModal()', 2000);
+			}
+
+			function hideModal(){
+			 $(".modalWindow").remove();
+				$.mobile.loading('hide');
+			  //$.mobile.hidePageLoadingMsg();
+
+			}
+			
+			// 	get all updated jobs
+			function getAllUpdatedJobs(responseJson){
+				
+				if(responseJson.status == "success"){
+					var updateUrl1 = "";
+					if(isDebug){											
+						updatedUrl1 = 'http://localhost:82/test_site/GetAllOpenedJobs.php';		
+					}
+					else{
+						updatedUrl1 = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';
+					}
+					makeAjaxCall(updatedUrl1,"getAllActiveJobs","");
+				}
+				else{
+					alert(responseJson.message);				
+				}				
+			}
+			
+			// function ended
 		
 			function assignJobToDriver(responseData){
 				if(responseData.status == "success"){
@@ -116,6 +167,7 @@
 			 function getAllActiveJobs(responseJson){
 				if(responseJson.status == "Success"){					
 					allActiveJobsArray = responseJson.response;
+					$('#allActivities').html("");
 					for(var i = 0;i < allActiveJobsArray.length; i++){					
 						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
 				
@@ -123,21 +175,14 @@
 					$('#getAllActiveJobsForm').trigger("create");
 					$("a.assignJob").on("click",function(e){
 						e.preventDefault();
-						var activityId = $(this).attr('id');
-						
+						var activityId = $(this).attr('id');						
 						for(var i = 0; i < allActiveJobsArray.length; i++){
 							if(activityId == allActiveJobsArray[i].activityId){
 								selectedActivity = allActiveJobsArray[i];
-								break;
-							
-							}
-						
-						}
-						
+								break;							
+							}						
+						}						
 						$(":mobile-pagecontainer").pagecontainer("change", "#jobDetailManager", { });
-						
-					
-					
 					
 				});
 				
@@ -196,6 +241,10 @@
 										case "getAllDriverJob":
 											getAllDriverJob(data);
 										break;
+										
+										case "getAllUpdatedJobs":
+											getAllUpdatedJobs(data);
+										break;
 
                                         default:
 							
@@ -213,13 +262,15 @@
 		
 			 
 		$(document).on("ready",function(){		
-			 
-			$(document).ajaxStart(function() {				
-				 $.mobile.loading('show');
+			
+			$(document).ajaxStart(function() {	
+				showModal();
+				 //$.mobile.loading('show');
 			});
 			
 			$(document).ajaxStop(function() {
-				 $.mobile.loading('hide');
+				 //$.mobile.loading('hide');
+					hideModal();
 			});
 
             
@@ -235,22 +286,16 @@
 					$('#allDriverList').listview('refresh');
 						$('a.viewDriverJobs').on('click',function(){
 							
-							var driverId = $(this).attr('id');							
-							isDriverFlowJobs = true;
-							isFirstCallToAllJob = true;
+							var driverId = $(this).attr('id');						
 							var url = '';
-							if(isDebug){
-								
+							if(isDebug){								
 								url = "http://localhost:82/test_site/GetDriverJobs.php?driverId="+driverId;
 							}
 							else{
-								url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;
-							
+								url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;							
 							}
-							makeAjaxCall(url,'getAllDriverJob','');														
-							isDriverFlowJobs = false;
-						
-						
+							makeAjaxCall(url,'getAllDriverJob','');												
+							
 						});
              
              
@@ -260,19 +305,32 @@
 			 // EVENT BINDING FOR GETTING AT ACTIVE JOB EVENTS
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
                 $('#allActivities').html('');
+				
 				var url = '';
 				
 					if(isDebug){	
 						url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
-						makeAjaxCall(url,'getAllActiveJobs','');
-						isFirstCallToAllJobs = false;
+						makeAjaxCall(url,'getAllActiveJobs','');						
 					}
 					else{
-						url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';						
-						makeAjaxCall(url,'getAllActiveJobs','');
-						isFirstCallToAllJobs = false;
-					}				
+						url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';												
+						makeAjaxCall(url,'getAllActiveJobs','');						
+					}		
+					
+				$("#getUpdatedActivties").on("click",function(e){
+					e.preventDefault();
+					var updatedUrl = "";
+					var updatedUrl1 = "";
+					if(isDebug){
+						updatedUrl = "http://localhost:82/test_site/UpdateActivities.php";
+						
+					}
+					else{
+						updatedUrl = "http://onecalljunkhaul.com/custom-webservices/UpdateActivities.php";										
+					}
+					makeAjaxCall(updatedUrl,"getAllUpdatedJobs","");								
 				
+				});
              });
 			// EVENT ENDED
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
@@ -555,6 +613,7 @@
 
 	<div data-role="header" data-theme="b" role="banner">
 		<h1>One Call Junk Haul</h1>
+		<a data-role="button" data-rel="refresh" class="ui-btn-right" id="getUpdatedActivties" data-icon="gear">Refresh</a>
 	</div><!-- /header -->
 
 		<div data-role="content" id="allActivities">

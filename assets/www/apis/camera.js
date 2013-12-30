@@ -41,7 +41,7 @@ function onPhotoURISuccess(imageURI) {
 
 function take_pic() {
     navigator.camera.getPicture(onPhotoDataSuccess, function(ex) {
-        alert("Camera Error!");
+        
     }, { quality : 30, destinationType: destinationType.DATA_URL });
 }
 
