@@ -20,12 +20,20 @@
 	
 	<script type="text/javascript" charset="utf-8">
 	     var text;
+		 var isDebug = false;
          var allDriverArray;
 		 var allActiveJobsArray;
+		 var allDriverjJob;
 		 var selectedAcitvity;
+		 var isFirstCallToAllJobs = true;
          var uuid;
+		 
+		 var isDriverFlowJobs = false;
 			
 		var responseData;
+			
+		
+		
 			function assignJobToDriver(responseData){
 				if(responseData.status == "success"){
 					alert(responseData.message);				
@@ -33,6 +41,21 @@
 				else{
 					alert(responseData.message);
 				}
+			
+			
+			}
+			
+			function getAllDriverJob(responseJson){
+				if(responseJson.status == "Success"){
+					allDriverJob = responseJson.response;
+					switchPage("#driverJob");
+				
+				}
+				else{
+					alert(responseJson.message);
+				
+				}
+			
 			
 			
 			}
@@ -72,8 +95,14 @@
 
 			 
 			 function authenticateUser(responseJson){
-				var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
-                //var urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+				
+				var urlGetAllDriver = '';
+				if(isDebug){
+					urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+				}
+				else{
+					urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
+                }
 				if(responseJson.status == "Success"){
 					makeAjaxCall(urlGetAllDriver,"getAllDriver","#listDriver");
 				}
@@ -85,7 +114,7 @@
 			 
 			 	 
 			 function getAllActiveJobs(responseJson){
-				if(responseJson.status == "Success"){
+				if(responseJson.status == "Success"){					
 					allActiveJobsArray = responseJson.response;
 					for(var i = 0;i < allActiveJobsArray.length; i++){					
 						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
@@ -112,6 +141,9 @@
 					
 				});
 				
+				}
+				else{										
+					alert(responseJson.message);
 				}
 			 
 			 }
@@ -160,6 +192,10 @@
 										case "assignJobToDriver":
 											assignJobToDriver(data);
 										break;
+										
+										case "getAllDriverJob":
+											getAllDriverJob(data);
+										break;
 
                                         default:
 							
@@ -194,9 +230,28 @@
 				
 				for(var i = 0; i < allDriverArray.length; i++){
 						nameDriver = allDriverArray[i].username;
-						$("#allDriverList").append("<li><a href=''>"+nameDriver+"</a></li>");
+						$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver+"</a></li>");
 					}					
 					$('#allDriverList').listview('refresh');
+						$('a.viewDriverJobs').on('click',function(){
+							
+							var driverId = $(this).attr('id');							
+							isDriverFlowJobs = true;
+							isFirstCallToAllJob = true;
+							var url = '';
+							if(isDebug){
+								
+								url = "http://localhost:82/test_site/GetDriverJobs.php?driverId="+driverId;
+							}
+							else{
+								url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;
+							
+							}
+							makeAjaxCall(url,'getAllDriverJob','');														
+							isDriverFlowJobs = false;
+						
+						
+						});
              
              
              });
@@ -205,11 +260,19 @@
 			 // EVENT BINDING FOR GETTING AT ACTIVE JOB EVENTS
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
                 $('#allActivities').html('');
-				//var url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
-				var url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';
-				makeAjaxCall(url,'getAllActiveJobs');
+				var url = '';
 				
-             
+					if(isDebug){	
+						url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
+						makeAjaxCall(url,'getAllActiveJobs','');
+						isFirstCallToAllJobs = false;
+					}
+					else{
+						url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';						
+						makeAjaxCall(url,'getAllActiveJobs','');
+						isFirstCallToAllJobs = false;
+					}				
+				
              });
 			// EVENT ENDED
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
@@ -237,7 +300,16 @@
 			 // EVENT BINDING FOR SHOWING DETAIL OF ACTIVITY/JOB
 			 $("#jobDetailManager").on('pagebeforeshow',function(){
 				$("#customerNameManager").val(selectedActivity.title);
+				$('#customerNameManager').attr('readonly', true);
 				$("#activityDescriptionManager").text(selectedActivity.description);
+				$('#activityDescriptionManager').attr('readonly', true);
+				
+				$("#btnBetaPhoto").on("click",function(e){
+						e.preventDefault();
+						take_pic();
+				
+				
+				});
 			 
 			 
 			 });
@@ -258,7 +330,7 @@
 				localStorage.setItem('userRole',selectedRole);
 				e.preventDefault();
 				if(selectedRole == "Manager"){
-					var url = ""; 
+					
 					var username = $("#userName").val();
 					var password = $("#password").val();
 					if(username == "" && password == ""){
@@ -266,10 +338,13 @@
 						
 					}
 					//alert(device.uuid);
-                    
-                    
-					//var url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Manager&imei=420";
-					var url = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
+                    var url = ""; 
+                    if(isDebug){
+						url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Manager&imei=420";
+					}
+					else{
+						url = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
+					}
 					makeAjaxCall(url,"authenticate","");
 			
 				}
@@ -292,8 +367,13 @@
 				}
 				
 				role = $("#createRole option:selected").text();
-				//var url = "http://localhost:82/test_site/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
-				var url = "http://onecalljunkhaul.com/custom-webservices/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
+				var url = '';
+				if(isDebug){
+					url = "http://localhost:82/test_site/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
+				}
+				else{
+					url = "http://onecalljunkhaul.com/custom-webservices/CreateNewUser.php?username="+username+"&password="+password+"&role="+role+"&imei=123";
+				}
 				makeAjaxCall(url,"createUser");
 			
 			
@@ -317,8 +397,14 @@
 				
 				// EVENT BINDING FOR SELECTING DRIVER AGAINST ANY PARTICULAR ACTIVITY
 				$("#assignJobDriver").on("collapsibleexpand",function(){
-					var urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
-					//var urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+					var urlGetAllDriver = '';
+					if(isDebug){	
+						urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";	
+					}
+					else{
+						urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
+					}					
+					
 					makeAjaxCall(urlGetAllDriver,"#getAllDriver","");
 							
 					$("#assignJobDriverList").html('');             
@@ -333,9 +419,14 @@
 						e.preventDefault();
 						var driverId = $(this).attr('id');
 						var url = "";
+						if(isDebug){
+							url = "http://localhost:82/test_site/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;						
+						}
+						else{
+							url = "http://onecalljunkhaul.com/custom-webservices/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;
+						}
 						
-						//var url = "http://localhost:82/test_site/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;						
-						var url = "http://onecalljunkhaul.com/custom-webservices/AssignJobToDriver.php?driverId="+driverId+"&activityId="+selectedActivity.activityId;
+						 
 						
 						
 						 makeAjaxCall(url,"assignJobToDriver","");
@@ -348,12 +439,58 @@
 				});
 				// EVENT ENDED
 				
+				//  GET ALL ACTIVE JOBS PANE
+				/*	$("#activeJobsPane").on('click',function(e){
+						e.preventDefault();
+						var url = '';
+						if(isFirstCallToAllJobs){
+							if(isDebug){							
+								url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';							
+							}
+							else{
+								url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';
+							}
+							
+							makeAjaxCall(url,'getAllActiveJobs','');
+							isFirstCallToAllJobs = false;
+						}
+						switchPage("#getAllActiveJobsForm");
+						
+					
+					
+					});*/
+				
+				
+				// EVENT ENDED
+				
+				$("#driverJob").on("pagebeforeshow",function(){
+				
+					
+					$("#driverActivity").html('');	
+					//allDriverJob = allActiveJobsArray[2];
+					if(allDriverJob instanceof Array){
+						for(var i = 0;i < allDriverJob.length; i++){					
+							$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'assignJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+					
+						}
+					}
+					else{
+						$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'assignJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+					}
+					$('#driverJob').trigger("create");
+			
+				
+				});
+				
+				
+				
+				
 		});	
 	</script>
 	
   </head>
   
-  <body onload="init();">
+<body onload="init();">
 	<!-- Start of first page -->
 <div data-role="page"  id="signInPage">
 
@@ -383,6 +520,31 @@
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
+
+<div data-role = "page" id="driverJob">
+	<div data-role="header" data-theme="b" role="banner">
+		<h1>One Call Junk Haul</h1>
+	</div><!-- /header -->
+	
+	<div data-role = "content" data-theme = "b>
+		
+		
+			<div data-role="content" >
+				<div data-role="collapsible-set" id="driverActivity" data-theme="a" data-content-theme="b">			
+				
+			</div>						
+			
+	</div><!-- /content -->
+
+	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
+		<h4>Page Footer</h4>
+	</div><!-- /footer -->
+	
+</div>
+	
+	
+
+
 
 
 
@@ -474,8 +636,8 @@
 	<div data-role="footer" data-id="fixNavbar" data-theme = "b" data-position="fixed">
 		<div data-role="navbar">
 				<ul>
-					<li><a href="#listDriver">Driver</a></li>
-					<li><a href="#getAllActiveJobsForm">Activities</a></li>								
+					<li><a id = "driverPane" href="#listDriver">Driver</a></li>
+					<li><a id = "activeJobsPane" href="#getAllActiveJobsForm">Activities</a></li>								
 				</ul>
 		</div><!-- /navbar -->		
 	</div><!-- /footer -->
@@ -891,7 +1053,7 @@
              </div>			 
 			 
 			 <div data-role="fieldcontain" class = "ui-hide-label">
-                   <a id="btnBetaPhoto" data-inline="true" data-role="button" data-theme="b" href="#page1">
+                   <a id="btnBetaPhoto" data-inline="true" data-role="button" onclick = "take_pic();" data-theme="b">
 						Upload Alpha Photo
 					</a>
             </div>

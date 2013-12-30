@@ -35,6 +35,9 @@ function onBackbutton() {
 var onDeviceReady = function() {
     console.log("deviceready event fired");
     
+    pictureSource=navigator.camera.PictureSourceType;
+    destinationType=navigator.camera.DestinationType;
+    
  
 };
 
