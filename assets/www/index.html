@@ -168,10 +168,49 @@
 				if(responseJson.status == "Success"){					
 					allActiveJobsArray = responseJson.response;
 					$('#allActivities').html("");
-					for(var i = 0;i < allActiveJobsArray.length; i++){					
-						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
-				
+					var driverInfo;
+					var driverInfoHtml = "";
+					if(allActiveJobsArray instanceof Array){	
+						
+						for(var i = 0;i < allActiveJobsArray.length; i++){								
+							
+							driverInfoHtml = '';
+							if(allActiveJobsArray[i].driverDetail != undefined){
+								driverId  = allActiveJobsArray[i].driverDetail.personId;
+								
+								driverFirstName = allActiveJobsArray[i].driverDetail.fName;
+								driverLastName = allActiveJobsArray[i].driverDetail.lName;
+							
+								driverFirstName = driverFirstName != '' ? driverFirstName : 'N/A';
+								driverLastName = driverLastName != '' ? driverLastName : 'N/A';
+
+								driverInfoHtml = '<p><font color="red"><b>'+driverFirstName+' '+driverLastName+'</b></font></p>';	
+							
+							}						
+							$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");					
+						}
 					}
+					else if(allActiveJobsArray != undefined){
+						//driverId = allActiveJobsArray.driverDetail.personId;
+						driverInfoHtml = '';
+						if(allActiveJobsArray.driverDetail != undefined){
+						
+							driverFirstName = allActiveJobsArray.driverDetail.fName;
+							driverLastName = allActiveJobsArray.driverDetail.lName;
+						
+							driverFirstName = driverFirstName != '' ? driverFirstName : 'N/A';
+							driverLastName = driverLastName != '' ? driverLastName : 'N/A';
+
+							driverInfoHtml = '<p><font color="red"><b>'+driverFirstName+' '+driverLastName+'</b></font></p>';
+						
+						}				
+							
+						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");
+					}
+					else{
+						return;
+					}
+					
 					$('#getAllActiveJobsForm').trigger("create");
 					$("a.assignJob").on("click",function(e){
 						e.preventDefault();
@@ -275,14 +314,24 @@
 
             
 			 // EVENT FOR LIST DRIVER FOR POPULATING LIST OF DRIVER
-			  $('#listDriver').on('pagebeforeshow', function() {
+				$('#listDriver').on('pagebeforeshow', function() {
 				$("#allDriverList").html('');
                
-				
-				for(var i = 0; i < allDriverArray.length; i++){
-						nameDriver = allDriverArray[i].username;
-						$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver+"</a></li>");
-					}					
+				if(allDriverArray instanceof Array){
+						for(var i = 0; i < allDriverArray.length; i++){
+							if(allDriverArray[i].personlInfo.fname != ''){	
+								nameDriver = allDriverArray[i].personlInfo.fname;								
+								$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver+"</a></li>");
+							}
+						}
+				}
+				else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){					
+					$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray.personlInfo.personId+"'"+" href=''>"+allDriverArray.personlInfo.fname+"</a></li>");					
+				}
+				else{
+					return;
+				}
+					
 					$('#allDriverList').listview('refresh');
 						$('a.viewDriverJobs').on('click',function(){
 							
@@ -358,6 +407,10 @@
 			 // EVENT BINDING FOR SHOWING DETAIL OF ACTIVITY/JOB
 			 $("#jobDetailManager").on('pagebeforeshow',function(){
 				$("#customerNameManager").val(selectedActivity.title);
+				$("#Contact").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.phone : '');
+				$("#Contact").attr('readonly', true);
+				$("#Address").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.state + ' ' + selectedActivity.customerDetail.street + ' ' + selectedActivity.customerDetail.city : '');
+				$("#Address").attr('readonly', true);
 				$('#customerNameManager').attr('readonly', true);
 				$("#activityDescriptionManager").text(selectedActivity.description);
 				$('#activityDescriptionManager').attr('readonly', true);
@@ -466,11 +519,21 @@
 					makeAjaxCall(urlGetAllDriver,"#getAllDriver","");
 							
 					$("#assignJobDriverList").html('');             
-				
-					for(var i = 0; i < allDriverArray.length; i++){
-							nameDriver = allDriverArray[i].username;
-							$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+nameDriver+"</a></li>");
-					}					
+					if(allDriverArray instanceof Array){
+						for(var i = 0; i < allDriverArray.length; i++){
+							if(allDriverArray[i].personlInfo != undefined && allDriverArray[i].personlInfo.fname != ''){
+								nameDriver = allDriverArray[i].username;
+								$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+allDriverArray[i].personlInfo.fname+"</a></li>");
+							}
+						}
+					}
+					else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){
+						$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray.personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+allDriverArray.personlInfo.fname+"</a></li>");
+					}
+					else{
+						return;
+					}
+						
 					$('#assignJobDriverList').listview('refresh');
 					
 					$("a.assignJobToDriver").on('click',function(e){
