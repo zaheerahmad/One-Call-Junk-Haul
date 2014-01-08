@@ -1,5 +1,6 @@
 <!-- Copyright (c) 2012 Mobile Developer Solutions -->
 <!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
   <head>
     <meta http-equiv="Content-type" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
@@ -33,11 +34,42 @@
 	
 	
 	<script type="text/javascript" charset="utf-8">
+		// FUNTIONS
+		// ######################################################
+			// "#1" driverCompleteProfile
+			// "#2" getAllUpdatedJobs
+			// "#3" assignJobToDriver
+			// "#4" getAllDriverJob
+			// "#5" switchPage
+			// "#6" getAllDriver
+			// "#7" authenticateUser
+			// "#8" getAllActiveJobs
+			// "#9" createUser
+			// "#10" makeAjaxCall
+			
+		
+		// JQUERY MOBILE EVENTS
+		// ######################################################
+			 // "#11" listDriver
+			 // "#12" getAllActiveJobsForm
+			 // "#13" createUser
+			 // "#14" jobDetailManager
+			 // "#15" signInForm
+			 // "#16" createUser
+			 // "#17" assignJobDriver
+			 // "#18" driverJob
+			 // "#19" driverCompleteProfile
+			//FORMS
+		//########################################################
+			// "#20" dayEndingScreen
+	
+		// ######################################################
+	
 	     var text;
 		 var isDebug = false;
          var allDriverArray;
 		 var allActiveJobsArray;
-		 var allDriverjJob;
+		 var allDriverJob;
 		 var selectedAcitvity;		 
          var uuid;
 		 
@@ -47,8 +79,9 @@
 			
 		
 		 $(document).on("mobileinit", function(){
-			$.mobile.ajaxEnabled=false;
+			$.mobile.ajaxEnabled=true;
 			$.mobile.loadingMessage = false;
+			$.support.cors = true;
 		});       
 			
 			function showModal(){
@@ -65,7 +98,33 @@
 
 			}
 			
+			
+			// "#1" driverCompleteProfile
+			function driverCompleteProfile(responseJson){
+			
+				if(responseJson.status == "Success"){
+					alert(responseJson.message);
+					
+					driverId = localStorage.getItem("personId");
+					var url = '';
+					if(isDebug){								
+						url = "http://localhost:82/test_site/GetDriverJobs.php?driverId="+driverId;
+					}
+					else{
+						url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;							
+					}
+					makeAjaxCall(url,'getAllDriverJob','');					
+					switchPage("#driverJob");
+				}
+				else{
+					alert(responseJson.message);
+				}
+			
+			
+			}
+			
 			// 	get all updated jobs
+			//"#2" getAllUpdatedJobs
 			function getAllUpdatedJobs(responseJson){
 				
 				if(responseJson.status == "success"){
@@ -84,7 +143,7 @@
 			}
 			
 			// function ended
-		
+			//"#3" assignJobToDriver
 			function assignJobToDriver(responseData){
 				if(responseData.status == "success"){
 					alert(responseData.message);				
@@ -95,16 +154,16 @@
 			
 			
 			}
-			
+			//"#4" getAllDriverJob
 			function getAllDriverJob(responseJson){
 				if(responseJson.status == "Success"){
-					allDriverJob = responseJson.response;
+					allDriverJob = responseJson.response;					
 					switchPage("#driverJob");
 				
 				}
 				else{
 					alert(responseJson.message);
-				
+					
 				}
 			
 			
@@ -112,7 +171,7 @@
 			}
 		   
 		   
-		   
+			//"#5" switchPage
 			function switchPage(nameOfPage){
 					var userRole = localStorage.getItem('userRole');
 					if(nameOfPage != ""){
@@ -130,12 +189,11 @@
 
 
 
-			 
+			 // "#6" getAllDriver
 			 function getAllDriver(responseJson,nameOfPage){				
 				if(responseJson.status == 'Success'){                 
-					allDriverArray = responseJson.response;	
-					//$.mobile.loadPage("#listDriver");								
-					//window.location.href = "#listDriver";				
+					allDriverArray = responseJson.response;
+								
 				}
 			
 			
@@ -144,18 +202,39 @@
 			 }
 
 
-			 
+			 // "#7" authenticateUser
 			 function authenticateUser(responseJson){
 				
-				var urlGetAllDriver = '';
-				if(isDebug){
-					urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+				if(responseJson.status == "Success"){				
+					localStorage.setItem('personId',responseJson.response.personId);	
+					localStorage.setItem("role",responseJson.response.role);				
 				}
-				else{
-					urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
-                }
-				if(responseJson.status == "Success"){
+				
+				if(responseJson.status == "Success" && responseJson.response.role.toUpperCase() == "manager".toUpperCase() ){
+					
+					var urlGetAllDriver = '';
+					if(isDebug){
+						urlGetAllDriver = "http://localhost:82/test_site/GetAllDrivers.php";
+					}
+					else{
+						urlGetAllDriver = "http://onecalljunkhaul.com/custom-webservices/GetAllDrivers.php";
+					}
+					
 					makeAjaxCall(urlGetAllDriver,"getAllDriver","#listDriver");
+				}
+				else if(responseJson.status == "Success" && responseJson.response.role == "Driver" && responseJson.code == 2 ){
+					switchPage("#driverCompleteProfile");				
+				}
+				else if(responseJson.status == "Success" && responseJson.response.role == "Driver" && responseJson.code == 1 ){
+							driverId = localStorage.getItem("personId");
+							var url = '';
+							if(isDebug){								
+								url = "http://localhost:82/test_site/GetDriverJobs.php?driverId="+driverId;
+							}
+							else{
+								url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;							
+							}
+							makeAjaxCall(url,'getAllDriverJob','');											
 				}
 				else{
 					alert(responseJson.message);
@@ -163,7 +242,7 @@
 				
 			 }
 			 
-			 	 
+			 // "#8" getAllActiveJobs
 			 function getAllActiveJobs(responseJson){
 				if(responseJson.status == "Success"){					
 					allActiveJobsArray = responseJson.response;
@@ -184,10 +263,10 @@
 								driverFirstName = driverFirstName != '' ? driverFirstName : 'N/A';
 								driverLastName = driverLastName != '' ? driverLastName : 'N/A';
 
-								driverInfoHtml = '<p><font color="red"><b>'+driverFirstName+' '+driverLastName+'</b></font></p>';	
+								driverInfoHtml = '<p><font color="red"><b>Driver Name : '+driverFirstName+' '+driverLastName+'</b></font></p>';	
 							
 							}						
-							$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");					
+							$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");					
 						}
 					}
 					else if(allActiveJobsArray != undefined){
@@ -201,11 +280,11 @@
 							driverFirstName = driverFirstName != '' ? driverFirstName : 'N/A';
 							driverLastName = driverLastName != '' ? driverLastName : 'N/A';
 
-							driverInfoHtml = '<p><font color="red"><b>'+driverFirstName+' '+driverLastName+'</b></font></p>';
+							driverInfoHtml = '<p><font color="red"><b>Driver Name :'+driverFirstName+' '+driverLastName+'</b></font></p>';
 						
 						}				
 							
-						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");
+						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");
 					}
 					else{
 						return;
@@ -232,6 +311,7 @@
 			 
 			 }
 			 
+			 // "#9" createUser
 			 function createUser(responseJson){
 				 if(responseJson.status == "Success"){
 					allDriverArray.push(responseJson.response);
@@ -243,6 +323,7 @@
 				 }			 
 			 }
 			 
+			 // "#10" makeAjaxCall
 			 function makeAjaxCall(urlHost,func,pageName){
 			 
 				
@@ -284,6 +365,10 @@
 										case "getAllUpdatedJobs":
 											getAllUpdatedJobs(data);
 										break;
+										
+										case "driverCompleteProfile":
+											driverCompleteProfile(data);
+										break;
 
                                         default:
 							
@@ -314,19 +399,21 @@
 
             
 			 // EVENT FOR LIST DRIVER FOR POPULATING LIST OF DRIVER
+				// "#11" listDriver
 				$('#listDriver').on('pagebeforeshow', function() {
 				$("#allDriverList").html('');
                
-				if(allDriverArray instanceof Array){
+				if(allDriverArray != undefined && allDriverArray instanceof Array){
 						for(var i = 0; i < allDriverArray.length; i++){
 							if(allDriverArray[i].personlInfo.fname != ''){	
 								nameDriver = allDriverArray[i].personlInfo.fname;								
-								$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver+"</a></li>");
+								driverLastName = allDriverArray[i].personlInfo.lname;
+								$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver + " " +driverLastName+"</a></li>");
 							}
 						}
 				}
-				else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){					
-					$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray.personlInfo.personId+"'"+" href=''>"+allDriverArray.personlInfo.fname+"</a></li>");					
+				else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){		lname			
+					$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray.personlInfo.personId+"'"+" href=''>"+allDriverArray.personlInfo.fname+ " " +allDriverArray.personlInfo.fname+"</a></li>");					
 				}
 				else{
 					return;
@@ -343,7 +430,7 @@
 							else{
 								url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;							
 							}
-							makeAjaxCall(url,'getAllDriverJob','');												
+							makeAjaxCall(url,'getAllDriverJob','');						;
 							
 						});
              
@@ -351,7 +438,8 @@
              });
 			 
 			 
-			 // EVENT BINDING FOR GETTING AT ACTIVE JOB EVENTS
+			 // EVENT BINDING FOR GETTING AN ACTIVE JOB EVENTS
+			 // "#12" getAllActiveJobsForm
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
                 $('#allActivities').html('');
 				
@@ -371,8 +459,7 @@
 					var updatedUrl = "";
 					var updatedUrl1 = "";
 					if(isDebug){
-						updatedUrl = "http://localhost:82/test_site/UpdateActivities.php";
-						
+						updatedUrl = "http://localhost:82/test_site/UpdateActivities.php";						
 					}
 					else{
 						updatedUrl = "http://onecalljunkhaul.com/custom-webservices/UpdateActivities.php";										
@@ -392,6 +479,7 @@
              });
 			
 			// CLEAR FORM WHEN USER IS CREATED 
+			// "#13" createUser
 			$("#createUser").on('pagebeforehide',function(){
 					$("#createUserName").val('');
 					$("#createPassword").val('');
@@ -405,13 +493,47 @@
 			 
 			 
 			 // EVENT BINDING FOR SHOWING DETAIL OF ACTIVITY/JOB
+			 // "#14" jobDetailManager
 			 $("#jobDetailManager").on('pagebeforeshow',function(){
-				$("#customerNameManager").val(selectedActivity.title);
-				$("#Contact").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.phone : '');
-				$("#Contact").attr('readonly', true);
-				$("#Address").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.state + ' ' + selectedActivity.customerDetail.street + ' ' + selectedActivity.customerDetail.city : '');
-				$("#Address").attr('readonly', true);
-				$('#customerNameManager').attr('readonly', true);
+				var isCustomerDetail = false;
+				if(selectedActivity.customerDetail != undefined){
+					isCustomerDetail = true;
+				}				
+				$("#titleActivityManager").val(selectedActivity.title);
+				$("#titleActivityManager").attr('readonly', true);				
+				$("#actvityStatusManager").val(selectedActivity.status != undefined ? selectedActivity.status : '');
+				$("#actvityStatusManager").attr('readonly', true);
+				$("#eventOwnerManager").val(selectedActivity.eventOwner != undefined ? selectedActivity.eventOwner : 'N/A');
+				$("#eventOwnerManager").attr('readonly', true);
+				
+				if(isCustomerDetail){
+					$("#Contact").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.phone : '');
+					$("#Contact").attr('readonly', true);
+					$("#leadSourceManager").val(selectedActivity.customerDetail.leadSource != undefined ? selectedActivity.customerDetail.leadSource : '');
+					$("#leadSourceManager").attr('readonly', true);
+					$("#lastActivityManager").val(selectedActivity.customerDetail.lastActivityTime != undefined ? selectedActivity.customerDetail.lastActivityTime : '');
+					$("#lastActivityManager").attr('readonly', true);
+					$("#customerNameManager").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.fName +" "+selectedActivity.customerDetail.lName : '');
+					$("#customerNameManager").attr('readonly', true);
+					$("#Address").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.state + ' ' + selectedActivity.customerDetail.street + ' ' + selectedActivity.customerDetail.city : '');
+					$("#Address").attr('readonly', true);
+					$('#customerNameManager').attr('readonly', true);
+				}
+				else{
+					$("#Contact").val('N/A');
+					$("#Contact").attr('readonly', true);
+					$("#leadSourceManager").val('N/A');
+					$("#leadSourceManager").attr('readonly', true);
+					$("#lastActivityManager").val('N/A');
+					$("#lastActivityManager").attr('readonly', true);
+					$("#customerNameManager").val('N/A');
+					$("#customerNameManager").attr('readonly', true);
+					$("#Address").val('N/A');
+					$("#Address").attr('readonly', true);
+					$('#customerNameManager').attr('readonly', true);
+				}
+				
+				
 				$("#activityDescriptionManager").text(selectedActivity.description);
 				$('#activityDescriptionManager').attr('readonly', true);
 				
@@ -436,35 +558,47 @@
 
 
 			// BINDING SIGN IN EVENT
+			// "#15" signInForm
 			$("#signInForm").on("submit",function(e){
 				var selectedRole = $( "#select-native-18 option:selected" ).text();
-				localStorage.setItem('userRole',selectedRole);
+				localStorage.setItem('userRole',selectedRole);				
 				e.preventDefault();
-				if(selectedRole == "Manager"){
+				var username = $("#userName").val();
+				var password = $("#password").val();
+				if(username == "" && password == ""){
+					alert("Username/Password cannot be empty .. ");
 					
-					var username = $("#userName").val();
-					var password = $("#password").val();
-					if(username == "" && password == ""){
-						alert("Username/Password cannot be empty .. ");
-						
-					}
+				}
+				if(selectedRole == "Manager"){					
+					
 					//alert(device.uuid);
                     var url = ""; 
+					
                     if(isDebug){
 						url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Manager&imei=420";
 					}
 					else{
+						uuidDevice = device.uuid;
 						url = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=manager&imei="+"351746052044511";
 					}
 					makeAjaxCall(url,"authenticate","");
 			
 				}
 				else{
-					alert("Please select manager for now ..");
+					if(isDebug){
+						url = "http://localhost:82/test_site/AuthenticateUser.php?username="+username+"&password="+password+"&role=Driver&imei=11111111";
+					}
+					else{
+						uuidDevice = device.uuid;
+						url = "http://onecalljunkhaul.com/custom-webservices/AuthenticateUser.php?username="+username+"&password="+password+"&role=Driver&imei="+uuidDevice;
+					}
+					makeAjaxCall(url,"authenticate","");				
+					//alert("Please select manager for now ..");
 				}						
 			});
 
 			// BINDING CREATE USER FORM
+			// "#16" createUser
 			$("#createUser").on("submit",function(e){
 				e.preventDefault();
 				username = $("#createUserName").val();
@@ -507,6 +641,7 @@
 				
 				
 				// EVENT BINDING FOR SELECTING DRIVER AGAINST ANY PARTICULAR ACTIVITY
+				// "#17" assignJobDriver
 				$("#assignJobDriver").on("collapsibleexpand",function(){
 					var urlGetAllDriver = '';
 					if(isDebug){	
@@ -523,12 +658,12 @@
 						for(var i = 0; i < allDriverArray.length; i++){
 							if(allDriverArray[i].personlInfo != undefined && allDriverArray[i].personlInfo.fname != ''){
 								nameDriver = allDriverArray[i].username;
-								$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+allDriverArray[i].personlInfo.fname+"</a></li>");
+								$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+allDriverArray[i].personlInfo.fname + ' ' + allDriverArray[i].personlInfo.lname +"</a></li>");
 							}
 						}
 					}
 					else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){
-						$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray.personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+allDriverArray.personlInfo.fname+"</a></li>");
+						$("#assignJobDriverList").append("<li><a id = "+"'"+allDriverArray.personlInfo.personId+"'"+" class='assignJobToDriver' href=''>"+allDriverArray.personlInfo.fname+ " " + allDriverArray.personlInfo.fname + "</a></li>");
 					}
 					else{
 						return;
@@ -583,23 +718,107 @@
 				
 				
 				// EVENT ENDED
+				// "#18" driverJob
+				$("#driverJob").on("pageinit",function(){
+					
+					$("#getAllJobDriver").on('click',function(e){
+													
+					});
+				});
 				
+				
+				// "#18" driverJob
 				$("#driverJob").on("pagebeforeshow",function(){
 				
-					
-					$("#driverActivity").html('');	
+					role = localStorage.getItem('role');
+					//$("#driverJobHeader").empty();
+					$("#endDayDriver").remove();
+					$("#getAllJobDriver").remove();
+				
+					if(role != undefined && role.toUpperCase() == "MANAGER"){
+						//$("#driverJobHeader").append('<h1>One Call Junk Haul</h1>');
+					}
+					else{						
+						$("#driverJobHeader").append('<a data-role="button" id="endDayDriver" data-rel="refresh" data-transition="slidedown" href="#dayEndingScreen" class="ui-btn-left" id="endJobButton" data-icon="gear">End Day</a><a data-role="button" data-rel="refresh" class="ui-btn-right" id="getAllJobDriver" data-icon="gear">Refresh</a>');
+						$("#getAllJobDriver").on("click",driverJobRefresh);
+					}
+					$("#driverJobHeader").trigger('create');
+					$("#driverActivity").empty();						
 					//allDriverJob = allActiveJobsArray[2];
-					if(allDriverJob instanceof Array){
+					if(allDriverJob != undefined && allDriverJob instanceof Array){
 						for(var i = 0;i < allDriverJob.length; i++){					
-							$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='index.html' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'assignJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+							$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
 					
 						}
 					}
+					else if(allDriverJob != undefined){
+						$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+					}
 					else{
-						$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'assignJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+						return;
 					}
 					$('#driverJob').trigger("create");
-			
+					$('a.detailDriverJob').on('click',showPageDetailForDriverJob);
+					
+					
+				});
+				// "#18"
+				$("#driverJob").on("pagebeforehide",function(){
+					role = localStorage.getItem("role");
+					if(role.toUpperCase() == "DRIVER"){
+						$("#getAllJobDriver").unbind("click",driverJobRefresh);				
+					}
+				});
+				
+				
+				// "#19" driverCompleteProfile
+				$("#driverCompleteProfile").on("pageinit",function(){
+					$("#driverCompleteProfileForm").on("submit",function(e){
+						e.preventDefault();
+						fname = $("#fn").val();
+						lname = $("#ln").val();
+						contactNo = $("#driverContactNo").val();
+						email = $("#driverEmailAddress").val();
+						address = $("#driverAddress").val();
+						
+						if(fname == ""){
+							alert("First name required..");
+							return;
+						}
+						else if(lname == ""){
+							alert("Last name required..");
+							return;
+						}
+						else if(contactNo == ""){
+							alert("Contact # required..");
+							return;
+						}
+						else if(email == ""){
+							alert("Email required..");
+							return;
+						}
+						else if(address == ""){
+							alert("Address required..")
+							return;
+						}
+						personId = localStorage.getItem("personId");
+						
+						url = "";
+						if(isDebug){
+							url = "http://localhost:82/test_site/UpdateProfile.php?personId="+personId+"&fName="+fname+"&lName="+lname+"&email="+email+"&address="+address+"&contact="+contactNo+"&imei=11111111&imsi=&device=Apple";
+							makeAjaxCall(url,"driverCompleteProfile","");
+						
+						}
+						else{
+							uuidDevice = device.uuid;
+							url = "http://onecalljunkhaul.com/custom-webservices/UpdateProfile.php?personId="+personId+"&fName="+fname+"&lName="+lname+"&email="+email+"&address="+address+"&contact="+contactNo+"&imei="+uuidDevice+"&imsi=&device=Apple";
+							makeAjaxCall(url,"driverCompleteProfile","");
+						}
+							
+					
+					
+					});
+				
 				
 				});
 				
@@ -622,7 +841,7 @@
 	<div data-role="content">
 		<form action="form.php" id="signInForm" method="post">
 			<label for="user">User Name</label>
-    		<input type="text" name="name" id="userName" value=""  />
+    		<input type="text" name="name" id="userName" autocomplete = "false" value=""  />
     		<label for="basic">Password</label>			
 			<input type="password" name="name" id="password" value=""  />
 			<div data-role="fieldcontain">			
@@ -643,18 +862,14 @@
 </div><!-- /page -->
 
 <div data-role = "page" id="driverJob">
-	<div data-role="header" data-theme="b" role="banner">
-		<h1>One Call Junk Haul</h1>
+	<div data-role="header" data-theme="b" id="driverJobHeader" role="banner">		
+			<h1>One Call Junk Haul</h1>
 	</div><!-- /header -->
 	
 	<div data-role = "content" data-theme = "b>
 		
-		
-			<div data-role="content" >
-				<div data-role="collapsible-set" id="driverActivity" data-theme="a" data-content-theme="b">			
-				
-			</div>						
-			
+				<div data-role="collapsible-set" id="driverActivity" data-theme="a" data-content-theme="b"/>
+
 	</div><!-- /content -->
 
 	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
@@ -674,7 +889,7 @@
 
 <div data-role="page"  id="getAllActiveJobsForm">
 
-	<div data-role="header" data-theme="b" role="banner">
+	<div data-role="header" data-theme="b" data-position="true" role="banner">
 		<h1>One Call Junk Haul</h1>
 		<a data-role="button" data-rel="refresh" class="ui-btn-right" id="getUpdatedActivties" data-icon="gear">Refresh</a>
 	</div><!-- /header -->
@@ -1157,24 +1372,50 @@
 		<div data-role="content">
 			 <fieldset>
 
-			<div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Name</label>
-                    <input type="text" name="name" id="customerNameManager" value="" placeholder="Please enter name of customer" disable/>
+			<div data-role="fieldcontain" class = "">
+                    <label for="titleActivityManager">Title :</label>
+                    <input type="text" name="titleActivityManager" id="titleActivityManager" value="" placeholder="" disable/>
              </div>
-			 <div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Address</label>
+			 
+			 <div data-role="fieldcontain" class = "">
+                    <label for="actvityStatusManager">Status :</label>
+                    <input type="text" name="actvityStatusManager" id="actvityStatusManager" value="" placeholder="" disable/>
+             </div>
+			 
+			 <div data-role="fieldcontain" class = "">
+                    <label for="eventOwnerManager">Event Owner :</label>
+                    <input type="text" name="eventOwnerManager" id="eventOwnerManager" value="" placeholder="" disable/>
+             </div>
+			  
+			 <div data-role="fieldcontain" class = "">
+                   <label for="activityDescriptionManager">Description :</label>
+					<textarea cols="40" rows="40" name="activityDescriptionManager" id="activityDescriptionManager"></textarea>
+             </div>		
+
+			<div data-role="fieldcontain" class = "">
+                    <label for="customerNameManager">Customer Name :</label>
+                    <input type="text" name="customerNameManager" id="customerNameManager" value="" placeholder="Please enter name of customer" disable/>
+             </div>
+			 <div data-role="fieldcontain" class = "">
+                    <label for="Address">Address :</label>
                     <input type="text" name="Address" id="Address" value="" placeholder="Address" disable/>
              </div>
-			 <div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Contact</label>
+			 <div data-role="fieldcontain" class = "">
+                    <label for="Contact">Contact :</label>
                     <input type="text" name="Contact" id="Contact" value="" placeholder="Contact" disable/>
              </div>
-			 <div data-role="fieldcontain" class = "ui-hide-label">
-                   <label for="textarea">Description</label>
-					<textarea cols="40" rows="40" name="description" id="activityDescriptionManager"></textarea>
-             </div>			 
+
+			 <div data-role="fieldcontain" class = "">
+                    <label for="leadSourceManager">Lead Source :</label>
+                    <input type="text" name="leadSourceManager" id="leadSourceManager" value="" placeholder="" disable/>
+             </div>	
 			 
-			 <div data-role="fieldcontain" class = "ui-hide-label">
+			 <div data-role="fieldcontain" class = "">
+                    <label for="lastActivityManager">Last Activity Time :</label>
+                    <input type="text" name="lastActivityManager" id="lastActivityManager" value="" placeholder="" disable/>
+             </div>	
+			 
+			 <div data-role="fieldcontain" class = "">
                    <a id="btnBetaPhoto" data-inline="true" data-role="button" onclick = "take_pic();" data-theme="b">
 						Upload Alpha Photo
 					</a>
@@ -1206,41 +1447,42 @@
 	</div><!-- /page -->	
 	
 	<!-- Day ending page for driver -->
+	<!-- "#20" dayEndingScreen -->
 	<div data-role="page" id="dayEndingScreen" data-postion = "fixed">
 
-		<div data-role="header">
-			<h1>Bar</h1>
+		<div data-role="header" data-theme="b" data-position="true">
+			<h1>One Call Junk Haul</h1>
 		</div><!-- /header -->
 
 		<div data-role="content">
 			 <fieldset>
 
-			<div data-role="fieldcontain" class = "ui-hide-label">                  
-					<label for="birth-place">Disposal Weight</label>
-                    <input type="text" name="disposalWeight" id="disposalWeight" value="" placeholder="Disposal Weight"/>
+			<div data-role="fieldcontain">                  
+					<label for="disposalWeight">Disposal Weight</label>
+                    <input type="text" name="disposalWeight" id="disposalWeight" value="" placeholder="Please enter disposal weight"/>
              </div>
-			<div data-role="fieldcontain" class = "ui-hide-label">                  
-					<label for="birth-place">Invoice Number</label>
-                    <input type="text" name="invoiceNumber" id="invoiceNumber" value="" placeholder="Invoice Number"/>
+			<div data-role="fieldcontain">                  
+					<label for="invoiceNumber">Invoice Number</label>
+                    <input type="text" name="invoiceNumber" id="invoiceNumber" value="" placeholder="Please enter invoice number"/>
              </div>
-			 <div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Gas</label>
-                    <input type="text" name="gas" id="gas" value="" placeholder="Gas"/>
+			 <div data-role="fieldcontain">
+                    <label for="gas">Gas</label>
+                    <input type="text" name="gas" id="gas" value="" placeholder="Please enter gas expense"/>
              </div>
-			 <div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Tolls</label>
-                    <input type="text" name="tolls" id="tolls" value="" placeholder="Tolls"/>
+			 <div data-role="fieldcontain">
+                    <label for="tolls">Tolls</label>
+                    <input type="text" name="tolls" id="tolls" value="" placeholder="Please enter toll expense "/>
              </div>
-			  <div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Disposal Expense</label>
-                    <input type="text" name="disposalExpense" id="disposalExpense" value="" placeholder="Disposal Expense"/>
+			  <div data-role="fieldcontain">
+                    <label for="disposalExpense">Disposal Expense</label>
+                    <input type="text" name="disposalExpense" id="disposalExpense" value="" placeholder="Please enter disposal Expense"/>
              </div>
-			  <div data-role="fieldcontain" class = "ui-hide-label">
-                    <label for="birth-place">Other Expense</label>
-                    <input type="text" name="otherExpense" id="otherExpense" value="" placeholder="Other Expense"/>
+			  <div data-role="fieldcontain">
+                    <label for="otherExpense">Other Expense</label>
+                    <input type="text" name="otherExpense" id="otherExpense" value="" placeholder="Please enter other expense"/>
              </div>			 
 			 
-			 <div data-role="fieldcontain" class = "ui-hide-label">
+			 <div data-role="fieldcontain">
                    <a id="btnDayEnd" data-role="button" data-inline="true" data-theme="b" href="#page1">
 						End
 					</a>
@@ -1258,7 +1500,7 @@
 		</div><!-- /content -->
 
 		<div data-role="footer" data-id="fixNavbar" data-position="fixed">
-			<div data-role="navbar">
+			<!--<div data-role="navbar">
 				<ul>
 					<li><a href="#driverSchedule">Activities</a></li>
 					<li><a href="#dayEndingScreen">End Day</a></li>								
@@ -1266,7 +1508,44 @@
 			</div><!-- /navbar -->
 		</div><!-- /footer -->
 	</div><!-- /page -->	
+	
+	
+<div data-role="page"  id="driverCompleteProfile">
+
+		<div data-role="header" data-theme="b" role="banner" data-position="fixed">
+			<h1>One Call Junk Haul</h1>			
+		</div><!-- /header -->
+
+		<div data-role="content">			
+				<form id="driverCompleteProfileForm">
+					<div style="padding:10px 20px;">
+						<h3>Please complete your profile</h3>
+						<label for="fm">First Name:</label>
+						<input type="text" name="user" id="fn" value="" placeholder="Please enter your first name" data-theme="a">
+						<label for="ln">Last Name:</label>
+						<input type="text" name="pass" id="ln" value="" placeholder="Please enter your last name" data-theme="a">
+						<label for="driverContactNo">Contact:</label>
+						<input type="text" name="pass" id="driverContactNo" value="" placeholder="Please enter your contact no" data-theme="a">
+						<label for="driverEmailAddress">Email:</label>
+						<input type="text" name="pass" id="driverEmailAddress" value="" placeholder="Please enter your email" data-theme="a">
+						<label for="driverAddress">Address:</label>
+						<input type="text" name="pass" id="driverAddress" value="" placeholder="Please enter your address" data-theme="a">
+						<button type="submit" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Submit</button>
+					</div>
+				</form>			
+		</div><!-- /content -->
+
+		<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+</div><!-- /page -->
+	
+	
+	
+	
+	
 <!--  	<script type="text/javascript" charset="utf-8" src="index.js"></script> -->
+	<script type="text/javascript" charset="utf-8" src="apis/driver.js"></script>
 	<script type="text/javascript" charset="utf-8" src="apis/accelerometer.js"></script>
  	<script type="text/javascript" charset="utf-8" src="apis/camera.js"></script>
  	<script type="text/javascript" charset="utf-8" src="apis/capture.js"></script>

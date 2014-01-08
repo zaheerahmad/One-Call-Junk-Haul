@@ -31,4 +31,20 @@ var onMenuButtonDown = function() {
 var onEventFired = function() {  // generic logging event handler
     console.log("an event fired");
 };
+
+
+var driverJobRefresh = function(e){
+    e.preventDefault();
+    var driverId = localStorage.getItem("personId");                        
+    var url = '';
+    if(isDebug){                                
+        url = "http://localhost:82/test_site/GetDriverJobs.php?driverId="+driverId;
+    }
+    else{
+        url = 'http://onecalljunkhaul.com/custom-webservices/GetDriverJobs.php?driverId='+driverId;                         
+    }
+    makeAjaxCall(url,'getAllDriverJob','');     
+    
+}
+
 // IMPORTANT: see device.js for document.addEventListener() for each event
