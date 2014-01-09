@@ -125,7 +125,7 @@
 			
 			// 	get all updated jobs
 			//"#2" getAllUpdatedJobs
-			function getAllUpdatedJobs(responseJson){
+			/*function getAllUpdatedJobs(responseJson){
 				
 				if(responseJson.status == "success"){
 					var updateUrl1 = "";
@@ -140,7 +140,7 @@
 				else{
 					alert(responseJson.message);				
 				}				
-			}
+			}*/
 			
 			// function ended
 			//"#3" assignJobToDriver
@@ -158,16 +158,22 @@
 			function getAllDriverJob(responseJson){
 				if(responseJson.status == "Success"){
 					allDriverJob = responseJson.response;					
-					switchPage("#driverJob");
-				
+					if(localStorage.getItem("role").toUpperCase() == "DRIVER" && localStorage.getItem("isDriverJobPageRefresh") == "true"){
+						//$.mobile.changePage( "#driverJob", {allowSamePageTransition: true, transition: "slideup", changeHash: false ,reloadPage: true });
+						getAllJobDriver2();
+						localStorage.setItem("isDriverJobPageRefresh","false");
+					}
+					else{
+						switchPage("#driverJob");
+					}					
+				}
+				else if(localStorage.getItem("role").toUpperCase() == "DRIVER"){					
+						alert(responseJson.message);
+						switchPage("#driverJob");					
 				}
 				else{
-					alert(responseJson.message);
-					
+					alert(responseJson.message);				
 				}
-			
-			
-			
 			}
 		   
 		   
@@ -316,7 +322,9 @@
 				 if(responseJson.status == "Success"){
 					allDriverArray.push(responseJson.response);
 					alert(responseJson.message);
-					$(":mobile-pagecontainer").pagecontainer("change", "#listDriver", { });					
+					$("#createUserName").val('');
+					$("#createPassword").val('');
+					$("#confirmCreatePassword").val('');
 				 }
 				 else{
 				     alert(responseJson.message);
@@ -363,11 +371,15 @@
 										break;
 										
 										case "getAllUpdatedJobs":
-											getAllUpdatedJobs(data);
+											getAllUpdatedJobsCallBack(data);
 										break;
 										
 										case "driverCompleteProfile":
 											driverCompleteProfile(data);
+										break;
+										
+										case "startDriverJobCallBackEvent":
+											startDriverJobCallBackEvent(data);
 										break;
 
                                         default:
@@ -401,23 +413,23 @@
 			 // EVENT FOR LIST DRIVER FOR POPULATING LIST OF DRIVER
 				// "#11" listDriver
 				$('#listDriver').on('pagebeforeshow', function() {
-				$("#allDriverList").html('');
-               
-				if(allDriverArray != undefined && allDriverArray instanceof Array){
-						for(var i = 0; i < allDriverArray.length; i++){
-							if(allDriverArray[i].personlInfo.fname != ''){	
-								nameDriver = allDriverArray[i].personlInfo.fname;								
-								driverLastName = allDriverArray[i].personlInfo.lname;
-								$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver + " " +driverLastName+"</a></li>");
+					$("#allDriverList").html('');
+				   
+					if(allDriverArray != undefined && allDriverArray instanceof Array){
+							for(var i = 0; i < allDriverArray.length; i++){
+								if(allDriverArray[i].personlInfo.fname != undefined && allDriverArray[i].personlInfo.fname.replace(/\s+/g, ' ') != ''){	
+									nameDriver = allDriverArray[i].personlInfo.fname;								
+									driverLastName = allDriverArray[i].personlInfo.lname;
+									$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray[i].personlInfo.personId+"'"+" href=''>"+nameDriver + " " +driverLastName+"</a></li>");
+								}
 							}
-						}
-				}
-				else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){		lname			
-					$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray.personlInfo.personId+"'"+" href=''>"+allDriverArray.personlInfo.fname+ " " +allDriverArray.personlInfo.fname+"</a></li>");					
-				}
-				else{
-					return;
-				}
+					}
+					else if(allDriverArray != undefined && allDriverArray.personlInfo != undefined && allDriverArray.personlInfo.fname != ''){		lname			
+						$("#allDriverList").append("<li><a class='viewDriverJobs' id = "+"'"+allDriverArray.personlInfo.personId+"'"+" href=''>"+allDriverArray.personlInfo.fname+ " " +allDriverArray.personlInfo.fname+"</a></li>");					
+					}
+					else{
+						return;
+					}
 					
 					$('#allDriverList').listview('refresh');
 						$('a.viewDriverJobs').on('click',function(){
@@ -442,8 +454,9 @@
 			 // "#12" getAllActiveJobsForm
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
                 $('#allActivities').html('');
+				getAllActiveJobsEvent();				
 				
-				var url = '';
+			/*	var url = '';
 				
 					if(isDebug){	
 						url = 'http://localhost:82/test_site/GetAllOpenedJobs.php';
@@ -452,9 +465,12 @@
 					else{
 						url = 'http://onecalljunkhaul.com/custom-webservices/GetAllOpenedJobs.php';												
 						makeAjaxCall(url,'getAllActiveJobs','');						
-					}		
+					}	*/	
 					
-				$("#getUpdatedActivties").on("click",function(e){
+					
+			
+				$("#getUpdatedActivties").on("click",updateActivityEvent);
+				/*$("#getUpdatedActivties").on("click",function(e){
 					e.preventDefault();
 					var updatedUrl = "";
 					var updatedUrl1 = "";
@@ -466,7 +482,7 @@
 					}
 					makeAjaxCall(updatedUrl,"getAllUpdatedJobs","");								
 				
-				});
+				*/
              });
 			// EVENT ENDED
 			 $("#getAllActiveJobsForm").on('pageinit',function(){             
@@ -496,6 +512,22 @@
 			 // "#14" jobDetailManager
 			 $("#jobDetailManager").on('pagebeforeshow',function(){
 				var isCustomerDetail = false;
+				$("#btnBetaPhoto").show();
+				$("#assignJobDriver").show();
+				$("#btnAphaPhoto").show();
+				$("#btnStartJob").show();
+				
+				if(localStorage.getItem("role").toUpperCase() == "DRIVER"){					
+					$("#btnBetaPhotoDiv").hide();
+					$("#assignJobDriver").hide();
+				}
+				else{
+					$("#btnAphaPhotoDiv").hide();
+					$("#btnStartJob").hide();		
+				
+				}
+				
+				
 				if(selectedActivity.customerDetail != undefined){
 					isCustomerDetail = true;
 				}				
@@ -543,6 +575,8 @@
 				
 				
 				});
+				
+				
 			 
 			 
 			 });
@@ -721,17 +755,15 @@
 				// "#18" driverJob
 				$("#driverJob").on("pageinit",function(){
 					
-					$("#getAllJobDriver").on('click',function(e){
-													
-					});
+					
 				});
 				
 				
 				// "#18" driverJob
-				$("#driverJob").on("pagebeforeshow",function(){
-				
+				//$("#driverJob").on("pagebeforeshow",function(){
+				$(document).on("pagebeforeshow","#driverJob",function(){
 					role = localStorage.getItem('role');
-					//$("#driverJobHeader").empty();
+					$("#driverActivity").empty();
 					$("#endDayDriver").remove();
 					$("#getAllJobDriver").remove();
 				
@@ -741,6 +773,7 @@
 					else{						
 						$("#driverJobHeader").append('<a data-role="button" id="endDayDriver" data-rel="refresh" data-transition="slidedown" href="#dayEndingScreen" class="ui-btn-left" id="endJobButton" data-icon="gear">End Day</a><a data-role="button" data-rel="refresh" class="ui-btn-right" id="getAllJobDriver" data-icon="gear">Refresh</a>');
 						$("#getAllJobDriver").on("click",driverJobRefresh);
+						$("#btnStartJob").on("click",startDriverJobEvent);
 					}
 					$("#driverJobHeader").trigger('create');
 					$("#driverActivity").empty();						
@@ -1415,9 +1448,21 @@
                     <input type="text" name="lastActivityManager" id="lastActivityManager" value="" placeholder="" disable/>
              </div>	
 			 
-			 <div data-role="fieldcontain" class = "">
+			 <div data-role="fieldcontain" id="btnBetaPhotoDiv" class = "">
                    <a id="btnBetaPhoto" data-inline="true" data-role="button" onclick = "take_pic();" data-theme="b">
+						Upload Beta Photo
+					</a>
+            </div>
+			
+			<div data-role="fieldcontain" id="btnAphaPhotoDiv" class = "">
+                   <a id="btnAphaPhoto" data-inline="true" data-role="button" onclick = "take_pic();" data-theme="b">
 						Upload Alpha Photo
+					</a>
+            </div>
+			
+			<div data-role="fieldcontain" id="btnStartJob" class = "">
+                   <a id="btnStartJobHref" data-inline="true" data-role="button" data-theme="b">
+						Start Job
 					</a>
             </div>
 			 
@@ -1538,13 +1583,15 @@
 		<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
-</div><!-- /page -->
+</div><!-- /page -->	
+
 	
-	
-	
-	
-	
-<!--  	<script type="text/javascript" charset="utf-8" src="index.js"></script> -->
+	<script type="text/javascript" charset="utf-8" src="apis/intialAjaxCallManager.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/managerEvents.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/callBackEventManager.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/intialAjaxCallDriver.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/driverEvents.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/callBackEventDriver.js"></script>
 	<script type="text/javascript" charset="utf-8" src="apis/driver.js"></script>
 	<script type="text/javascript" charset="utf-8" src="apis/accelerometer.js"></script>
  	<script type="text/javascript" charset="utf-8" src="apis/camera.js"></script>

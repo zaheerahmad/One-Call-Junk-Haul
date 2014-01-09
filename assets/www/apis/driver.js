@@ -1,21 +1,6 @@
 
 
-var showPageDetailForDriverJob = function(e){
-    e.preventDefault();
-    var activityId = $(this).attr('id');
-    if(allDriverJob instanceof Array){
-        for(var i = 0; i < allDriverJob.length; i++){
-            if(activityId == allDriverJob[i].activityId){
-                selectedActivity = allDriverJob[i];
-                break;                          
-            }                       
-        }
-    } 
-    else if(activityId == allDriverJob.activityId){
-        selectedActivity = allDriverJob;
-    }
-    switchPage("#jobDetailManager");
-}
+
 
 
 function getAllActiveJobs(responseJson){
