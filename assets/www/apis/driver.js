@@ -3,7 +3,7 @@
 
 
 
-function getAllActiveJobs(responseJson){
+/*function getAllActiveJobs(responseJson){
 				if(responseJson.status == "Success"){					
 					allActiveJobsArray = responseJson.response;
 					$('#allActivities').html("");
@@ -69,4 +69,4 @@ function getAllActiveJobs(responseJson){
 					alert(responseJson.message);
 				}
 			 
-			 }
+			 }*/

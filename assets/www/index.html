@@ -27,6 +27,7 @@
 			z-index: 1501;
 		}
 	</style>
+	<link rel="stylesheet" href="themes/x.min.css" />
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<!--<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>-->
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
@@ -249,7 +250,7 @@
 			 }
 			 
 			 // "#8" getAllActiveJobs
-			 function getAllActiveJobs(responseJson){
+			/* function getAllActiveJobs(responseJson){
 				if(responseJson.status == "Success"){					
 					allActiveJobsArray = responseJson.response;
 					$('#allActivities').html("");
@@ -272,7 +273,7 @@
 								driverInfoHtml = '<p><font color="red"><b>Driver Name : '+driverFirstName+' '+driverLastName+'</b></font></p>';	
 							
 							}						
-							$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");					
+							$('#allActivities').append("<div data-theme= 'a' data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");					
 						}
 					}
 					else if(allActiveJobsArray != undefined){
@@ -315,7 +316,7 @@
 					alert(responseJson.message);
 				}
 			 
-			 }
+			 }*/
 			 
 			 // "#9" createUser
 			 function createUser(responseJson){
@@ -537,6 +538,10 @@
 				$("#actvityStatusManager").attr('readonly', true);
 				$("#eventOwnerManager").val(selectedActivity.eventOwner != undefined ? selectedActivity.eventOwner : 'N/A');
 				$("#eventOwnerManager").attr('readonly', true);
+				$("#actvityStartTimeManager").val(selectedActivity.startTime != '' ? selectedActivity.startTime : 'N/A');
+				$("#actvityStartTimeManager").attr('readonly', true);
+				$("#actvityEndTimeManager").val(selectedActivity.endTime != '' ? selectedActivity.endTime : 'N/A');
+				$("#actvityEndTimeManager").attr('readonly', true);			
 				
 				if(isCustomerDetail){
 					$("#Contact").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.phone : '');
@@ -889,7 +894,7 @@
 		</form>
 	</div><!-- /content -->
 
-	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
+	<!--<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
@@ -905,7 +910,7 @@
 
 	</div><!-- /content -->
 
-	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
+	<!--<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 	
@@ -978,7 +983,7 @@
 		</form>
 	</div><!-- /content -->
 
-	<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
+	<!--<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page -->
@@ -1171,7 +1176,7 @@
 	
 		</div><!-- /content -->
 
-		<div data-role="footer" data-theme = "b" data-position="fixed">
+		<!--<div data-role="footer" data-theme = "b" data-position="fixed">
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
 	</div><!-- /page -->
@@ -1247,7 +1252,7 @@
 			</a>
 		</div><!-- /content -->
 
-		<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
+		<!--<div data-role="footer" data-position="fixed" data-theme="a" role="banner">
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
 </div><!-- /page -->
@@ -1416,6 +1421,16 @@
              </div>
 			 
 			 <div data-role="fieldcontain" class = "">
+                    <label for="actvityStatusManager">Start Time :</label>
+                    <input type="text" name="actvityStartTimeManager" id="actvityStartTimeManager" value="" placeholder="" disable/>
+             </div>
+			 
+			 <div data-role="fieldcontain" class = "">
+                    <label for="actvityEndTimeManager">End Time :</label>
+                    <input type="text" name="actvityEndTimeManager" id="actvityEndTimeManager" value="" placeholder="" disable/>
+             </div>
+			 
+			 <div data-role="fieldcontain" class = "">
                     <label for="eventOwnerManager">Event Owner :</label>
                     <input type="text" name="eventOwnerManager" id="eventOwnerManager" value="" placeholder="" disable/>
              </div>
@@ -1486,7 +1501,7 @@
 		</div>-->		
 		</div><!-- /content -->
 
-		<div data-role="footer" data-position="fixed">
+		<!--<div data-role="footer" data-position="fixed">
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
 	</div><!-- /page -->	
@@ -1580,7 +1595,7 @@
 				</form>			
 		</div><!-- /content -->
 
-		<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
+		<!--<div data-role="footer" data-position="fixed" data-theme="b" role="banner">
 			<h4>Page Footer</h4>
 		</div><!-- /footer -->
 </div><!-- /page -->	
