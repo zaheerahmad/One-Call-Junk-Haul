@@ -273,7 +273,7 @@
 								driverInfoHtml = '<p><font color="red"><b>Driver Name : '+driverFirstName+' '+driverLastName+'</b></font></p>';	
 							
 							}						
-							$('#allActivities').append("<div data-theme= 'a' data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");					
+							$('#allActivities').append("<div data-theme= 'a' data-role='collapsible'><h2>"+allActiveJobsArray[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p>"+driverInfoHtml+"</a></li></ul></div>");					
 						}
 					}
 					else if(allActiveJobsArray != undefined){
@@ -291,7 +291,7 @@
 						
 						}				
 							
-						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p>"+driverInfoHtml+"</a></li></ul></div>");
+						$('#allActivities').append("<div data-role='collapsible'><h2>"+allActiveJobsArray.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p>"+driverInfoHtml+"</a></li></ul></div>");
 					}
 					else{
 						return;
@@ -785,12 +785,12 @@
 					//allDriverJob = allActiveJobsArray[2];
 					if(allDriverJob != undefined && allDriverJob instanceof Array){
 						for(var i = 0;i < allDriverJob.length; i++){					
-							$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+							$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p></a></li></ul></div>");
 					
 						}
 					}
 					else if(allDriverJob != undefined){
-						$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+						$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p></a></li></ul></div>");
 					}
 					else{
 						return;
@@ -1412,7 +1412,8 @@
 
 			<div data-role="fieldcontain" class = "">
                     <label for="titleActivityManager">Title :</label>
-                    <input type="text" name="titleActivityManager" id="titleActivityManager" value="" placeholder="" disable/>
+					<textarea cols="40" rows="8" name="titleActivityManager" id="titleActivityManager" placeholder="" readonly></textarea>
+                    <!--<input type="text" name="titleActivityManager" id="titleActivityManager" value="" placeholder="" disable/>-->
              </div>
 			 
 			 <div data-role="fieldcontain" class = "">
@@ -1437,7 +1438,7 @@
 			  
 			 <div data-role="fieldcontain" class = "">
                    <label for="activityDescriptionManager">Description :</label>
-					<textarea cols="40" rows="40" name="activityDescriptionManager" id="activityDescriptionManager"></textarea>
+					<textarea cols="50" rows="70" name="activityDescriptionManager" id="activityDescriptionManager" readonly></textarea>
              </div>		
 
 			<div data-role="fieldcontain" class = "">
@@ -1518,28 +1519,28 @@
 			 <fieldset>
 
 			<div data-role="fieldcontain">                  
-					<label for="disposalWeight">Disposal Weight</label>
-                    <input type="text" name="disposalWeight" id="disposalWeight" value="" placeholder="Please enter disposal weight"/>
+					<label for="disposalWeight">Disposal Weight (In KGs)</label>
+                    <input type="number" name="disposalWeight" id="disposalWeight" value="" placeholder="Please enter disposal weight"/>
              </div>
 			<div data-role="fieldcontain">                  
-					<label for="invoiceNumber">Invoice Number</label>
+					<label for="invoiceNumber">Invoice Number (Comma Separated if more than 1)</label>
                     <input type="text" name="invoiceNumber" id="invoiceNumber" value="" placeholder="Please enter invoice number"/>
              </div>
 			 <div data-role="fieldcontain">
-                    <label for="gas">Gas</label>
-                    <input type="text" name="gas" id="gas" value="" placeholder="Please enter gas expense"/>
+                    <label for="gas">Gas ($$)</label>
+                    <input type="number" name="gas" id="gas" value="" placeholder="Please enter gas expense"/>
              </div>
 			 <div data-role="fieldcontain">
-                    <label for="tolls">Tolls</label>
-                    <input type="text" name="tolls" id="tolls" value="" placeholder="Please enter toll expense "/>
+                    <label for="tolls">Tolls ($$)</label>
+                    <input type="number" name="tolls" id="tolls" value="" placeholder="Please enter toll expense "/>
              </div>
 			  <div data-role="fieldcontain">
-                    <label for="disposalExpense">Disposal Expense</label>
-                    <input type="text" name="disposalExpense" id="disposalExpense" value="" placeholder="Please enter disposal Expense"/>
+                    <label for="disposalExpense">Disposal Expense ($$)</label>
+                    <input type="number" name="disposalExpense" id="disposalExpense" value="" placeholder="Please enter disposal expense"/>
              </div>
 			  <div data-role="fieldcontain">
-                    <label for="otherExpense">Other Expense</label>
-                    <input type="text" name="otherExpense" id="otherExpense" value="" placeholder="Please enter other expense"/>
+                    <label for="otherExpense">Other Expense ($$)</label>
+                    <input type="number" name="otherExpense" id="otherExpense" value="" placeholder="Please enter other expense"/>
              </div>			 
 			 
 			 <div data-role="fieldcontain">
