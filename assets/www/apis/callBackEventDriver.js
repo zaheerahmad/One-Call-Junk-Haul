@@ -19,12 +19,16 @@ var getAllJobDriver2  = function(){
     //allDriverJob = allActiveJobsArray[2];
     if(allDriverJob != undefined && allDriverJob instanceof Array){
         for(var i = 0;i < allDriverJob.length; i++){                    
-            $('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+            
+            //var date = new Date(allDriverJob[i].startTime.toString().split(" ")[0]);
+            //var jobStartDate = date.getMonthName()+","+date.getDayName()+","+date.getFullYear();
+            jobStartDate = convertDateToString(allDriverJob[i].startTime.toString().split(" ")[0]);
+            $('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob[i].title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>"+jobStartDate+"<span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob[i].activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob[i].title+"</h3><p><strong>"+allDriverJob[i].description+"</strong></p><p>"+allDriverJob[i].customerName+"</p><p class='ui-li-aside'><strong>"+allDriverJob[i].startTime+"</strong></p></a></li></ul></div>");
     
         }
     }
     else if(allDriverJob != undefined){
-        $('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p><p class='ui-li-aside'><strong>6:24</strong>PM</p></a></li></ul></div>");
+        $('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p><p class='ui-li-aside'><strong>"+allDriverJob.startTime+"</strong></p></a></li></ul></div>");
     }
     else{
         return;

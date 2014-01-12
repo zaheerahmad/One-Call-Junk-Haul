@@ -1,6 +1,7 @@
 
 
-var startDriverJobEvent = function(){
+var startDriverJobEvent = function(e){
+    e.preventDefault();
     activityId = localStorage.getItem("activityId");
     startDriverJobIntialAjax(activityId);    
 }

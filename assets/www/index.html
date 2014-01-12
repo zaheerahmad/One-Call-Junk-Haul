@@ -65,6 +65,18 @@
 			// "#20" dayEndingScreen
 	
 		// ######################################################
+		
+		
+		Date.prototype.getMonthName = function() {
+			var m = ['January','February','March','April','May','June','July',
+			'August','September','October','November','December'];
+			return m[this.getMonth()];
+		} 
+		Date.prototype.getDayName = function() {
+				var d = ['Sunday','Monday','Tuesday','Wednesday',
+				'Thursday','Friday','Saturday'];
+				return d[this.getDay()];
+		}
 	
 	     var text;
 		 var isDebug = false;
@@ -170,9 +182,11 @@
 				}
 				else if(localStorage.getItem("role").toUpperCase() == "DRIVER"){					
 						alert(responseJson.message);
+						allDriverJob = undefined;
 						switchPage("#driverJob");					
 				}
 				else{
+					allDriverJob = undefined;
 					alert(responseJson.message);				
 				}
 			}
@@ -381,6 +395,7 @@
 										
 										case "startDriverJobCallBackEvent":
 											startDriverJobCallBackEvent(data);
+											$("btnStartJob").hide();
 										break;
 
                                         default:
@@ -434,6 +449,11 @@
 					
 					$('#allDriverList').listview('refresh');
 						$('a.viewDriverJobs').on('click',function(){
+							var driverId = $(this).attr('id');						
+							getDriverJobIntialAjax(driverId);
+						});
+						
+						/*$('a.viewDriverJobs').on('click',function(){
 							
 							var driverId = $(this).attr('id');						
 							var url = '';
@@ -445,7 +465,7 @@
 							}
 							makeAjaxCall(url,'getAllDriverJob','');						;
 							
-						});
+						});*/
              
              
              });
@@ -517,14 +537,23 @@
 				$("#assignJobDriver").show();
 				$("#btnAphaPhoto").show();
 				$("#btnStartJob").show();
+				$("#btnEndJob").show();
 				
-				if(localStorage.getItem("role").toUpperCase() == "DRIVER"){					
+				if(localStorage.getItem("role").toUpperCase() == "DRIVER" && selectedActivity.isJobStarted.toUpperCase() == "YES"){					
 					$("#btnBetaPhotoDiv").hide();
 					$("#assignJobDriver").hide();
+					$("#btnStartJob").hide();
+				}
+				else if(localStorage.getItem("role").toUpperCase() == "DRIVER" && selectedActivity.isJobStarted.toUpperCase() == "NO"){
+					$("#btnBetaPhotoDiv").hide();
+					$("#assignJobDriver").hide();
+					$("#btnEndJob").hide();
+					
 				}
 				else{
 					$("#btnAphaPhotoDiv").hide();
-					$("#btnStartJob").hide();		
+					$("#btnStartJob").hide();
+					$("#btnEndJob").hide();					
 				
 				}
 				
@@ -541,7 +570,11 @@
 				$("#actvityStartTimeManager").val(selectedActivity.startTime != '' ? selectedActivity.startTime : 'N/A');
 				$("#actvityStartTimeManager").attr('readonly', true);
 				$("#actvityEndTimeManager").val(selectedActivity.endTime != '' ? selectedActivity.endTime : 'N/A');
-				$("#actvityEndTimeManager").attr('readonly', true);			
+				$("#actvityEndTimeManager").attr('readonly', true);	
+				$("#managerDriverStartedJob").val(selectedActivity.isJobStarted != '' ? selectedActivity.isJobStarted : 'N/A');
+				$("#managerDriverStartedJob").attr('readonly', true);	
+
+				
 				
 				if(isCustomerDetail){
 					$("#Contact").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.phone : '');
@@ -552,7 +585,7 @@
 					$("#lastActivityManager").attr('readonly', true);
 					$("#customerNameManager").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.fName +" "+selectedActivity.customerDetail.lName : '');
 					$("#customerNameManager").attr('readonly', true);
-					$("#Address").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.state + ' ' + selectedActivity.customerDetail.street + ' ' + selectedActivity.customerDetail.city : '');
+					$("#Address").val(selectedActivity.customerDetail != undefined ? selectedActivity.customerDetail.street + ' ' + selectedActivity.customerDetail.state + ' ' + selectedActivity.customerDetail.city : '');
 					$("#Address").attr('readonly', true);
 					$('#customerNameManager').attr('readonly', true);
 				}
@@ -766,9 +799,12 @@
 				
 				// "#18" driverJob
 				//$("#driverJob").on("pagebeforeshow",function(){
-				$(document).on("pagebeforeshow","#driverJob",function(){
+				getAllJobDriver2
+				$(document).on("pagebeforeshow","#driverJob",getAllJobDriver2);
+				
+				/*$(document).on("pagebeforeshow","#driverJob",function(){
 					role = localStorage.getItem('role');
-					$("#driverActivity").empty();
+					//$("#driverActivity").empty();
 					$("#endDayDriver").remove();
 					$("#getAllJobDriver").remove();
 				
@@ -793,13 +829,14 @@
 						$('#driverActivity').append("<div data-role='collapsible'><h2>"+allDriverJob.title+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allDriverJob.activityId+"'"+" class = 'detailDriverJob'><h3>"+allDriverJob.title+"</h3><p><strong>"+allDriverJob.description+"</strong></p><p>"+allDriverJob.customerName+"</p></a></li></ul></div>");
 					}
 					else{
+						$("#driverActivity").empty();
 						return;
 					}
 					$('#driverJob').trigger("create");
 					$('a.detailDriverJob').on('click',showPageDetailForDriverJob);
 					
 					
-				});
+				});*/
 				// "#18"
 				$("#driverJob").on("pagebeforehide",function(){
 					role = localStorage.getItem("role");
@@ -1422,6 +1459,11 @@
              </div>
 			 
 			 <div data-role="fieldcontain" class = "">
+                    <label for="managerDriverStartedJob">Driver Started Job? :</label>
+                    <input type="text" name="managerDriverStartedJob" id="managerDriverStartedJob" value="" placeholder="" disable/>
+             </div>
+			 
+			 <div data-role="fieldcontain" class = "">
                     <label for="actvityStatusManager">Start Time :</label>
                     <input type="text" name="actvityStartTimeManager" id="actvityStartTimeManager" value="" placeholder="" disable/>
              </div>
@@ -1481,6 +1523,14 @@
 						Start Job
 					</a>
             </div>
+			
+			<div data-role="fieldcontain" id="btnEndJob" class = "">
+                   <a id="btnEndJobHref" data-inline="true" data-role="button" data-theme="b">
+						End Job
+					</a>
+            </div>
+			
+			
 			 
 			 <div data-role="collapsible" data-theme="b" id="assignJobDriver" data-content-theme="c">
 				<h2>Choose a driver...</h2>
@@ -1601,7 +1651,7 @@
 		</div><!-- /footer -->
 </div><!-- /page -->	
 
-	
+	<script type="text/javascript" charset="utf-8" src="apis/utility.js"></script>
 	<script type="text/javascript" charset="utf-8" src="apis/intialAjaxCallManager.js"></script>
 	<script type="text/javascript" charset="utf-8" src="apis/managerEvents.js"></script>
 	<script type="text/javascript" charset="utf-8" src="apis/callBackEventManager.js"></script>

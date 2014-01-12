@@ -47,7 +47,8 @@ var getAllActiveJobs = function(responseJson){
                 else if(allActiveJobsArray[i].status.toUpperCase() == "JOB TIME FINISHED"){
                     titleJob =   '<font color="red">'+allActiveJobsArray[i].title+'</font>';
                 }
-                $('#allActivities').append("<div data-theme='a' data-role='collapsible'><h2>"+titleJob+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong></strong></p>"+driverInfoHtml+"</a></li></ul></div>");                  
+                jobStartDate = convertDateToString(allActiveJobsArray[i].startTime.toString().split(" ")[0]);             
+                $('#allActivities').append("<div data-theme='a' data-role='collapsible'><h2>"+titleJob+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>"+jobStartDate+"<span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray[i].activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray[i].title+"</h3><p><strong>"+allActiveJobsArray[i].description+"</strong></p><p>"+allActiveJobsArray[i].customerName+"</p><p class='ui-li-aside'><strong>"+allActiveJobsArray[i].startTime+"</strong></p>"+driverInfoHtml+"</a></li></ul></div>");                  
             }
         }
         else if(allActiveJobsArray != undefined){
@@ -76,7 +77,7 @@ var getAllActiveJobs = function(responseJson){
                 titleJob =   '<font color="red">'+allActiveJobsArray[i].title+'</font>';
             }
                 
-            $('#allActivities').append("<div style='background:red;' data-role='collapsible'><h2>"+titleJob+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p><p class='ui-li-aside'><strong></strong></p>"+driverInfoHtml+"</a></li></ul></div>");
+            $('#allActivities').append("<div style='background:red;' data-role='collapsible'><h2>"+titleJob+"</h2><ul data-role='listview' data-theme='a' data-divider-theme='b'><li data-role='list-divider'>Friday, October 8, 2010 <span class='ui-li-count'>2</span></li><li><a href='' id = "+"'"+allActiveJobsArray.activityId+"'"+" class = 'assignJob'><h3>"+allActiveJobsArray.title+"</h3><p><strong>"+allActiveJobsArray.description+"</strong></p><p>"+allActiveJobsArray.customerName+"</p><p class='ui-li-aside'><strong>"+allActiveJobsArray.startTime+"</strong></p>"+driverInfoHtml+"</a></li></ul></div>");
         }
         else{
             return;
